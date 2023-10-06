@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:pvers_customer/authentication/login_screen.dart';
 import 'package:pvers_customer/tab_pages/home_tab.dart';
 import 'package:pvers_customer/authentication/host_a_vehicle.dart';
 import 'package:pvers_customer/tab_pages/profile.dart';
@@ -39,7 +40,7 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
   void initState(){
     super.initState();
 
-    tabController = TabController(length: 5, vsync: this);
+    tabController = TabController(length: 6, vsync: this);
   }
   @override
   Widget build(BuildContext context) {
@@ -55,6 +56,7 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
          rentacarpage(),
          profilepage(),
          signupscreen(),
+         LoginScreen(),
        ],
      ),
       bottomNavigationBar: BottomNavigationBar(
@@ -83,6 +85,10 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
           BottomNavigationBarItem(
             icon: Icon(Icons.login),
             label: "signup screen",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.login),
+            label: "login screen",
           ),
         ],
         unselectedItemColor: Colors.white54,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pvers_customer/authentication/host_a_vehicle.dart';
+import 'package:pvers_customer/authentication/login_screen.dart';
 
 class signupscreen extends StatefulWidget {
 
@@ -235,6 +236,17 @@ class _signupscreenState extends State<signupscreen>
                  ),
 
                ),
+           ),
+           TextButton(
+             child: const Text(
+               "Already have an account? Login Here",
+               style: TextStyle(color: Colors.grey),
+
+             ),
+             onPressed:()
+             {
+               Navigator.push(context, MaterialPageRoute(builder: (c)=> LoginScreen()));
+             },
            ),
          ],
        ),
