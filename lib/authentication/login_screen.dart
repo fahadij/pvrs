@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mysql_client/mysql_client.dart';
 import 'package:pvers_customer/MainScreens/main_screen.dart';
 import 'package:pvers_customer/authentication/signup_page.dart';
 
@@ -113,7 +114,8 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 20,),
               ElevatedButton(
                 onPressed: (){
-                  Navigator.push(context, MaterialPageRoute(builder: (c)=> MainScreen()));
+                  _insert();
+                  //Navigator.push(context, MaterialPageRoute(builder: (c)=> MainScreen()));
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.lightGreenAccent,
@@ -146,5 +148,37 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
     );
+
   }
+  Future<void> _insert() async{
+    var phone1 = phoneTextEditingController.text;
+    var pass1 = passTextEditingController.text;
+    var owner_pass = '';
+    print("Connecting to mysql server...");
+
+    final conn = await MySQLConnection.createConnection(
+        host: '10.0.2.2',
+        port: 3306,
+        userName: 'root',
+        password: 'root',
+        databaseName: 'pvers');
+
+    await conn.connect();
+    print("Connected");
+    var res = await conn.execute("SELECT * FROM owner WHERE owner_phonenum = '$phone1' AND owner_pass ='$pass1'");
+    //owner_pass= '$pass1'
+
+
+
+    if(res.numOfRows ==1){
+      print("user is found");
+    }
+    else{
+      print("user is not found");
+    }
+
+    await conn.close();
+  }
+
+
 }

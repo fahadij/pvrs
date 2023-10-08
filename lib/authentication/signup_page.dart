@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:pvers_customer/authentication/host_a_vehicle.dart';
 import 'package:pvers_customer/authentication/login_screen.dart';
+import 'dart:async';
+import 'package:mysql_client/mysql_client.dart';
 
 class signupscreen extends StatefulWidget {
 
@@ -9,8 +11,13 @@ class signupscreen extends StatefulWidget {
   State<signupscreen> createState() => _signupscreenState();
 }
 
-class _signupscreenState extends State<signupscreen>
-{
+class _signupscreenState extends State<signupscreen>{
+
+
+
+  
+
+
 
 
   @override
@@ -22,7 +29,10 @@ class _signupscreenState extends State<signupscreen>
   TextEditingController emailTextEditingController = TextEditingController();
 
 
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context)
+  {
+
+
     return Scaffold(
       backgroundColor: Colors.black,
       body: SingleChildScrollView(
@@ -221,9 +231,7 @@ class _signupscreenState extends State<signupscreen>
 
            const SizedBox(height: 20,),
            ElevatedButton(
-               onPressed: (){
-                 Navigator.push(context, MaterialPageRoute(builder: (c)=> hostacarpage()));
-               },
+               onPressed:_insert,
                style: ElevatedButton.styleFrom(
                  backgroundColor: Colors.lightGreenAccent,
                ),
@@ -253,5 +261,29 @@ class _signupscreenState extends State<signupscreen>
      ),
       ),
     );
+  }
+  Future<void> _insert() async{
+    print("Connecting to mysql server...");
+
+    final conn = await MySQLConnection.createConnection(
+        host: '10.0.2.2',
+        port: 3306,
+        userName: 'root',
+        password: 'root',
+        databaseName: 'pvers');
+
+    await conn.connect();
+    print("Connected");
+    var res = await conn.execute("INSERT INTO owner (owner_id,owner_name,owner_phonenum,owner_email,owner_pass) VALUES (:id1, :name1, :phone1, :email1, :pass1)",
+      {
+        "id1": idTextEditingController.text,
+        "name1": nameTextEditingController.text,
+        "phone1": phoneTextEditingController.text,
+        "email1": emailTextEditingController.text,
+        "pass1": passTextEditingController.text,
+      },
+    );
+    print(res.affectedRows);
+    await conn.close();
   }
 }
