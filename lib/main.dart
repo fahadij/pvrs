@@ -1,9 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:pvers_customer/splashScreen/splash_screen.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
 void main() async
 {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+
   runApp(
     MyApp(
       child:MaterialApp(
@@ -21,6 +28,7 @@ void main() async
 
 class MyApp extends StatefulWidget
 {
+
    final Widget? child;
 
    MyApp({this.child});
@@ -35,6 +43,7 @@ class MyApp extends StatefulWidget
 }
 
 class _MyAppState extends State<MyApp> {
+
   Key key = UniqueKey();
   void restartApp(){
     setState(() {
