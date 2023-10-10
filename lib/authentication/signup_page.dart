@@ -6,6 +6,8 @@ import 'dart:async';
 import 'package:mysql_client/mysql_client.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:pvers_customer/widgets/progress_dialog.dart';
+import 'package:get/get_utils/get_utils.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class signupscreen extends StatefulWidget {
 
@@ -14,8 +16,9 @@ class signupscreen extends StatefulWidget {
   State<signupscreen> createState() => _signupscreenState();
 }
 
-class _signupscreenState extends State<signupscreen>
-{
+class _signupscreenState extends State<signupscreen> {
+
+
 
   TextEditingController idTextEditingController = TextEditingController();
   TextEditingController nameTextEditingController = TextEditingController();
@@ -24,325 +27,321 @@ class _signupscreenState extends State<signupscreen>
   TextEditingController emailTextEditingController = TextEditingController();
 
 
-validateForm() async {
+  validateForm() async {
+    if (!idTextEditingController.text.startsWith("1")) {
+      Fluttertoast.showToast(msg: "ID must start with 1.");
+    }
 
-   if (!idTextEditingController.text.startsWith("1")) {
-  Fluttertoast.showToast(msg: "ID must start with 1.");
-  }
+    else if (idTextEditingController.text.length < 10) {
+      Fluttertoast.showToast(msg: "ID must be 10 digit.");
+    }
 
-   else if (idTextEditingController.text.length < 10) {
-    Fluttertoast.showToast(msg: "ID must be 10 digit.");
-  }
+    else if (nameTextEditingController.text.length < 3) {
+      Fluttertoast.showToast(msg: "name must be at least 3 Characters.");
+    }
 
-  else if (nameTextEditingController.text.length < 3) {
-    Fluttertoast.showToast(msg: "name must be at least 3 Characters.");
-  }
+    else if (!emailTextEditingController.text.contains("@")) {
+      Fluttertoast.showToast(msg: "Email is not Valid.");
+    }
+    else if (!GetUtils.isEmail(emailTextEditingController.text)) {
+      Fluttertoast.showToast(msg: "Email is not Valid.");
+    }
 
-  else if (!emailTextEditingController.text.contains("@")) {
-    Fluttertoast.showToast(msg: "Email is not Valid.");
-  }
+    else if (passTextEditingController.text.isEmpty) {
+      Fluttertoast.showToast(msg: "password must not be empty.");
+    }
+    else if (!GetUtils.isPhoneNumber(phoneTextEditingController.text)) {
+      Fluttertoast.showToast(msg: "the phone must start with 05.");
+    }
+    else if (passTextEditingController.text.length <= 8) {
+      Fluttertoast.showToast(msg: "password must be at least 8 Characters.");
+    }
 
-  else if (passTextEditingController.text.isEmpty) {
-    Fluttertoast.showToast(msg: "password must not be empty.");
-  }
-  else if (passTextEditingController.text.length <= 8) {
-    Fluttertoast.showToast(msg: "password must be at least 8 Characters.");
-  }
-   /*else if (phoneTextEditingController.text.startsWith("05")) {
-     Fluttertoast.showToast(msg: "the phone must start with 05.");
-   }*/
-  else if (phoneTextEditingController.text.length < 10) {
-    Fluttertoast.showToast(msg: "phone must be 10 digit.");
-  }
+    else if (phoneTextEditingController.text.length < 10) {
+      Fluttertoast.showToast(msg: "phone must be 10 digit.");
+    }
 
-  else {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext c)
-      {
-        return ProgressDialo(message: "Processing, Please wait",);
+    else {
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+      
+      showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (BuildContext c) {
+            return ProgressDialo(message: "Processing, Please wait",);
+          }
+      );
+      var id = idTextEditingController.text;
+      print("Connecting to mysql server...");
+
+      final conn = await MySQLConnection.createConnection(
+          host: '10.0.2.2',
+          port: 3306,
+          userName: 'root',
+          password: 'root',
+          databaseName: 'pvers');
+
+      await conn.connect();
+      print("Connected");
+      var res = await conn.execute(
+          "SELECT * FROM owner WHERE owner_id = '$id'");
+      //owner_pass= '$pass1'
+
+
+      if (res.numOfRows == 1) {
+        Fluttertoast.showToast(msg: "this id is already registered.");
+        print("user is found");
+        Navigator.pop(context);
       }
-    );
-     var id = idTextEditingController.text;
-     print("Connecting to mysql server...");
+      else {
+        print("user is not found");
+        insert();
+        await prefs.setString('ID1', id);
+      }
 
-     final conn = await MySQLConnection.createConnection(
-         host: '10.0.2.2',
-         port: 3306,
-         userName: 'root',
-         password: 'root',
-         databaseName: 'pvers');
-
-     await conn.connect();
-     print("Connected");
-     var res = await conn.execute("SELECT * FROM owner WHERE owner_id = '$id'");
-     //owner_pass= '$pass1'
-
-
-
-     if(res.numOfRows ==1){
-       Fluttertoast.showToast(msg: "this id is already registered.");
-       print("user is found");
-       Navigator.pop(context);
-     }
-     else{
-       print("user is not found");
-       insert();
-     }
-
-     await conn.close();
-   }
-
-
+      await conn.close();
+    }
   }
-
-
-
-
-
 
 
   @override
-  Widget build(BuildContext context)
-  {
-
-
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
       body: SingleChildScrollView(
-     child: Padding(
-       padding: const EdgeInsets.all(16.0),
-       child: Column(
-         children: [
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
 
-            const SizedBox(height: 10,),
+              const SizedBox(height: 10,),
 
-           Padding(
-             padding: const EdgeInsets.all(20.0),
-             child: Image.asset("images/logo-color.png"),
-           ),
-           const SizedBox(height: 10),
+              Padding(
+                padding: const EdgeInsets.all(20.0),
+                child: Image.asset("images/logo-color.png"),
+              ),
+              const SizedBox(height: 10),
 
-           const Text(
+              const Text(
 
-               "Register user",
-             style: TextStyle(
+                "Register user",
+                style: TextStyle(
 
-               fontSize: 26,
-               color: Colors.grey,
-               fontWeight: FontWeight.bold,
-             ),
+                  fontSize: 26,
+                  color: Colors.grey,
+                  fontWeight: FontWeight.bold,
+                ),
 
-           ),
-
-
-           TextField(
-             controller: idTextEditingController,
-             keyboardType: TextInputType.phone,
-
-             style: TextStyle(
-               color: Colors.grey,
-             ),
-             decoration: InputDecoration(
-               labelText: "ID",
-               hintText: "ID",
-
-               enabledBorder: UnderlineInputBorder(
-                 borderSide: BorderSide(color: Colors.white),
-
-               ),
-                 focusedBorder: UnderlineInputBorder(
-             borderSide: BorderSide(color: Colors.white),
-
-           ),
-                 hintStyle: TextStyle(
-                   color: Colors.grey,
-                   fontSize: 14,
-                 ),
-
-                 labelStyle: TextStyle(
-               color: Colors.grey,
-               fontSize: 14,
-                             ),
-
-             ),
+              ),
 
 
-           ),
+              TextField(
+                controller: idTextEditingController,
+                keyboardType: TextInputType.phone,
 
-           TextField(
-             controller: nameTextEditingController,
-             style: TextStyle(
-               color: Colors.grey,
-             ),
-             decoration: InputDecoration(
-               labelText: "Name",
-               hintText: "Name",
+                style: TextStyle(
+                  color: Colors.grey,
+                ),
+                decoration: InputDecoration(
+                  labelText: "ID",
+                  hintText: "ID",
 
-               enabledBorder: UnderlineInputBorder(
-                 borderSide: BorderSide(color: Colors.white),
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white),
 
-               ),
-               focusedBorder: UnderlineInputBorder(
-                 borderSide: BorderSide(color: Colors.white),
+                  ),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white),
 
-               ),
-               hintStyle: TextStyle(
-                 color: Colors.grey,
-                 fontSize: 14,
-               ),
+                  ),
+                  hintStyle: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 14,
+                  ),
 
-               labelStyle: TextStyle(
-                 color: Colors.grey,
-                 fontSize: 14,
-               ),
+                  labelStyle: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 14,
+                  ),
 
-             ),
-
-
-           ),
-
-           TextField(
-             controller: emailTextEditingController,
-             keyboardType: TextInputType.emailAddress,
-
-             style: TextStyle(
-               color: Colors.grey,
-             ),
-             decoration: InputDecoration(
-               labelText: "Email",
-               hintText: "Email",
-
-               enabledBorder: UnderlineInputBorder(
-                 borderSide: BorderSide(color: Colors.white),
-
-               ),
-               focusedBorder: UnderlineInputBorder(
-                 borderSide: BorderSide(color: Colors.white),
-
-               ),
-               hintStyle: TextStyle(
-                 color: Colors.grey,
-                 fontSize: 14,
-               ),
-
-               labelStyle: TextStyle(
-                 color: Colors.grey,
-                 fontSize: 14,
-               ),
-
-             ),
+                ),
 
 
-           ),
+              ),
 
-           TextField(
-             controller: passTextEditingController,
-             keyboardType: TextInputType.text,
-             obscureText: true,
-             style: TextStyle(
-               color: Colors.grey,
-             ),
-             decoration: InputDecoration(
-               labelText: "Password",
-               hintText: "Password",
+              TextField(
+                controller: nameTextEditingController,
+                style: TextStyle(
+                  color: Colors.grey,
+                ),
+                decoration: InputDecoration(
+                  labelText: "Name",
+                  hintText: "Name",
 
-               enabledBorder: UnderlineInputBorder(
-                 borderSide: BorderSide(color: Colors.white),
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white),
 
-               ),
-               focusedBorder: UnderlineInputBorder(
-                 borderSide: BorderSide(color: Colors.white),
+                  ),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white),
 
-               ),
-               hintStyle: TextStyle(
-                 color: Colors.grey,
-                 fontSize: 14,
-               ),
+                  ),
+                  hintStyle: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 14,
+                  ),
 
-               labelStyle: TextStyle(
-                 color: Colors.grey,
-                 fontSize: 14,
-               ),
+                  labelStyle: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 14,
+                  ),
 
-             ),
+                ),
 
 
-           ),
+              ),
 
-           TextField(
-             controller: phoneTextEditingController,
-             keyboardType: TextInputType.phone,
-             style: TextStyle(
-               color: Colors.grey,
-             ),
-             decoration: InputDecoration(
-               labelText: "Phone",
-               hintText: "Phone",
+              TextField(
+                controller: emailTextEditingController,
+                keyboardType: TextInputType.emailAddress,
 
-               enabledBorder: UnderlineInputBorder(
-                 borderSide: BorderSide(color: Colors.white),
+                style: TextStyle(
+                  color: Colors.grey,
+                ),
+                decoration: InputDecoration(
+                  labelText: "Email",
+                  hintText: "Email",
 
-               ),
-               focusedBorder: UnderlineInputBorder(
-                 borderSide: BorderSide(color: Colors.white),
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white),
 
-               ),
-               hintStyle: TextStyle(
-                 color: Colors.grey,
-                 fontSize: 14,
-               ),
+                  ),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white),
 
-               labelStyle: TextStyle(
-                 color: Colors.grey,
-                 fontSize: 14,
-               ),
+                  ),
+                  hintStyle: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 14,
+                  ),
 
-             ),
+                  labelStyle: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 14,
+                  ),
+
+                ),
 
 
-           ),
+              ),
 
-           const SizedBox(height: 20,),
-           ElevatedButton(
-               onPressed:()
-               {
-                 validateForm();
-               },
-                 style:
-                 ElevatedButton.styleFrom(
-                   backgroundColor: Colors.lightGreenAccent,
-                 ),
+              TextField(
+                controller: passTextEditingController,
+                keyboardType: TextInputType.text,
+                obscureText: true,
+                style: TextStyle(
+                  color: Colors.grey,
+                ),
+                decoration: InputDecoration(
+                  labelText: "Password",
+                  hintText: "Password",
 
-               child: Text
-                 (
-                   "Create Account",
-                 style: TextStyle(
-                     color: Colors.black54,
-                   fontSize: 18,
-                 ),
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white),
 
-               ),
-           ),
-           TextButton(
-             child: const Text(
-               "Already have an account? Login Here",
-               style: TextStyle(color: Colors.grey),
+                  ),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white),
 
-             ),
-             onPressed:()
-             {
-               Navigator.push(context, MaterialPageRoute(builder: (c)=> LoginScreen()));
-             },
-           ),
-         ],
-       ),
-     ),
+                  ),
+                  hintStyle: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 14,
+                  ),
+
+                  labelStyle: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 14,
+                  ),
+
+                ),
+
+
+              ),
+
+              TextField(
+                controller: phoneTextEditingController,
+                keyboardType: TextInputType.phone,
+                style: TextStyle(
+                  color: Colors.grey,
+                ),
+                decoration: InputDecoration(
+                  labelText: "Phone",
+                  hintText: "Phone",
+
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white),
+
+                  ),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white),
+
+                  ),
+                  hintStyle: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 14,
+                  ),
+
+                  labelStyle: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 14,
+                  ),
+
+                ),
+
+
+              ),
+
+              const SizedBox(height: 20,),
+              ElevatedButton(
+                onPressed: () {
+                  validateForm();
+                },
+                style:
+                ElevatedButton.styleFrom(
+                  backgroundColor: Colors.lightGreenAccent,
+                ),
+
+                child: Text
+                  (
+                  "Create Account",
+                  style: TextStyle(
+                    color: Colors.black54,
+                    fontSize: 18,
+                  ),
+
+                ),
+              ),
+              TextButton(
+                child: const Text(
+                  "Already have an account? Login Here",
+                  style: TextStyle(color: Colors.grey),
+
+                ),
+                onPressed: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (c) => LoginScreen()));
+                },
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
-  Future<void> insert() async{
+
+  Future<void> insert() async {
     print("Connecting to mysql server...");
 
     final conn = await MySQLConnection.createConnection(
@@ -354,7 +353,8 @@ validateForm() async {
 
     await conn.connect();
     print("Connected");
-    var res = await conn.execute("INSERT INTO owner (owner_id,owner_name,owner_phonenum,owner_email,owner_pass) VALUES (:id1, :name1, :phone1, :email1, :pass1)",
+    var res = await conn.execute(
+      "INSERT INTO owner (owner_id,owner_name,owner_phonenum,owner_email,owner_pass) VALUES (:id1, :name1, :phone1, :email1, :pass1)",
       {
         "id1": idTextEditingController.text.trim(),
         "name1": nameTextEditingController.text.trim(),
@@ -367,6 +367,25 @@ validateForm() async {
 
     await conn.close();
     Fluttertoast.showToast(msg: "the user registered successfully");
+
     Navigator.pop(context);
+    send();
+    Navigator.push(context,MaterialPageRoute(builder: (c) => const hostacarpage()));
+
+  }
+
+  Future<void> send() async {
+    const String subject = "the user registered successfully";
+    const String body = "test";
+
+    /*final Email email = Email(
+      from: ['www.mt2arab.com@gmail.com'],
+      body: body,
+      subject: subject,
+      recipients: [emailTextEditingController.text],
+      cc: ['www.mt22arab.com@gmail.com'],
+      bcc: ['www.mt222arab.com@gmail.com'],
+
+    );*/
   }
 }

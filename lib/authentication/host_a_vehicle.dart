@@ -2,8 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:mysql_client/mysql_client.dart';
 import 'package:pvers_customer/MainScreens/main_screen.dart';
+import 'package:pvers_customer/authentication/login_screen.dart';
 import 'package:pvers_customer/tab_pages/home_tab.dart';
 import 'package:pvers_customer/widgets/progress_dialog.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
+
+import '../global/global.dart';
 
 class hostacarpage extends StatefulWidget {
   const hostacarpage({super.key});
@@ -24,6 +30,25 @@ class _hostacarpageState extends State<hostacarpage> {
   List<String> carTypesList = ["size-big", "size-medium", "size-small"];
   String? selectedCarType;
   bool isChecked = false;
+  TextEditingController idTextEditingController = TextEditingController();
+  String token= "";
+
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getCred();
+  }
+  void getCred() async{
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    setState(() {
+      token= pref.getString("ID1")!;
+      idTextEditingController.text =  token;
+
+    });
+  }  @override
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -89,6 +114,39 @@ class _hostacarpageState extends State<hostacarpage> {
 
               ),
 
+              TextField(
+                controller: idTextEditingController,
+                keyboardType: TextInputType.phone,
+                readOnly: true,
+
+                style: const TextStyle(
+                  color: Colors.grey,
+                ),
+                decoration: const InputDecoration(
+                  labelText: "user id",
+
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white),
+
+                  ),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white),
+
+                  ),
+                  hintStyle: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 14,
+                  ),
+
+                  labelStyle: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 14,
+                  ),
+
+                ),
+
+
+              ),
               TextField(
                 controller: vehiclenameTextEditingController,
                 style: const TextStyle(
@@ -184,6 +242,35 @@ class _hostacarpageState extends State<hostacarpage> {
                   );
                 }).toList(),
               ),
+              const SizedBox(height: 20,),
+              DropdownButton(
+                dropdownColor: Colors.white24,
+                hint: const Text(
+                    "Please choose Car Type",
+                    style: TextStyle(
+                      fontSize: 14.0,
+                      color: Colors.grey,
+
+                    )
+                ),
+                value: selectedCarType,
+                onChanged: (newValue) {
+                  setState(() {
+                    selectedCarType = newValue.toString();
+                  });
+                },
+                items: carTypesList.map((car) {
+                  return DropdownMenuItem(
+                    child: Text(
+                      car,
+                      style: const TextStyle(
+                          color: Colors.grey
+                      ),
+                    ),
+                    value: car,
+                  );
+                }).toList(),
+              ),
 
 
               Row(
@@ -246,7 +333,11 @@ class _hostacarpageState extends State<hostacarpage> {
 
               const SizedBox(height: 20,),
               ElevatedButton(
-                onPressed: () {validateForm();},
+                onPressed: () {
+                  validateForm();
+                  getCred();
+                  initState();
+                },
                   //Navigator.push(context,MaterialPageRoute(builder: (c) => const MainScreen()));
 
 
@@ -256,6 +347,28 @@ class _hostacarpageState extends State<hostacarpage> {
                 child: const Text
                   (
                   "Register Vehicle",
+                  style: TextStyle(
+                    color: Colors.black54,
+                    fontSize: 18,
+                  ),
+
+                ),
+              ),
+          const SizedBox(height: 20,),
+
+          ElevatedButton(
+                onPressed: () {
+                  Navigator.push(context,MaterialPageRoute(builder: (c) => const LoginScreen()));
+                },
+
+
+
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.lightGreenAccent,
+                ),
+                child: const Text
+                  (
+                  "back to login",
                   style: TextStyle(
                     color: Colors.black54,
                     fontSize: 18,
@@ -337,6 +450,7 @@ class _hostacarpageState extends State<hostacarpage> {
   Future<void> insert() async{
     print("Connecting to mysql server...");
 
+
     final conn = await MySQLConnection.createConnection(
         host: '10.0.2.2',
         port: 3306,
@@ -346,13 +460,14 @@ class _hostacarpageState extends State<hostacarpage> {
 
     await conn.connect();
     print("Connected");
-    var res = await conn.execute("INSERT INTO vehicle (V_num,V_Name,V_Model,V_EV,V_Type) VALUES (:vid1, :vn, :vm, :ev, :et)",
+    var res = await conn.execute("INSERT INTO vehicle (V_num,V_Name,V_Model,V_EV,V_Type,owner_id_V) VALUES (:vid1, :vn, :vm, :ev, :et, :uid)",
       {
         "vid1": vehiclenumTextEditingController.text.trim(),
         "vn": vehiclenameTextEditingController.text.trim(),
         "vm": vehiclemodelTextEditingController.text.trim(),
         "ev": isChecked,
         "et": selectedCarType,
+        "uid":idTextEditingController.text,
       },
     );
     print(res.affectedRows);

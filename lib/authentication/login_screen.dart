@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:mysql_client/mysql_client.dart';
 import 'package:pvers_customer/MainScreens/main_screen.dart';
+import 'package:pvers_customer/authentication/host_a_vehicle.dart';
 import 'package:pvers_customer/authentication/signup_page.dart';
+import 'package:pvers_customer/global/global.dart';
+import 'package:pvers_customer/tab_pages/home_tab.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -12,7 +17,7 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
 
-  TextEditingController phoneTextEditingController = TextEditingController();
+  TextEditingController idTextEditingController = TextEditingController();
   TextEditingController passTextEditingController = TextEditingController();
 
   @override
@@ -45,14 +50,14 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
 
               TextField(
-                controller: phoneTextEditingController,
+                controller: idTextEditingController,
                 keyboardType: TextInputType.phone,
                 style: TextStyle(
                   color: Colors.grey,
                 ),
                 decoration: InputDecoration(
-                  labelText: "Phone",
-                  hintText: "Phone",
+                  labelText: "ID",
+                  hintText: "ID",
 
                   enabledBorder: UnderlineInputBorder(
                     borderSide: BorderSide(color: Colors.white),
@@ -151,7 +156,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   }
   Future<void> _insert() async{
-    var phone1 = phoneTextEditingController.text;
+    var id1 = idTextEditingController.text;
     var pass1 = passTextEditingController.text;
     var owner_pass = '';
     print("Connecting to mysql server...");
@@ -165,13 +170,18 @@ class _LoginScreenState extends State<LoginScreen> {
 
     await conn.connect();
     print("Connected");
-    var res = await conn.execute("SELECT * FROM owner WHERE owner_phonenum = '$phone1' AND owner_pass ='$pass1'");
+    var res = await conn.execute("SELECT * FROM owner WHERE owner_id = '$id1' AND owner_pass ='$pass1'");
     //owner_pass= '$pass1'
 
 
 
     if(res.numOfRows ==1){
       print("user is found");
+      SharedPreferences.setMockInitialValues({});
+
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString('ID1', id1);
+      Navigator.push(context,MaterialPageRoute(builder: (c) => const MainScreen()));
     }
     else{
       print("user is not found");
