@@ -3,6 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:pvers_customer/MainScreens/main_screen.dart';
 import 'package:pvers_customer/authentication/signup_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../authentication/login_screen.dart';
 
 class MySplashScreen extends StatefulWidget
 {
@@ -23,7 +26,7 @@ class _MySplashScreenState extends State<MySplashScreen>
     Timer(const Duration(seconds: 3),() async
     {
       //send user to home screen
-      Navigator.push(context, MaterialPageRoute(builder: (c)=> MainScreen()));
+      Navigator.push(context, MaterialPageRoute(builder: (c)=> LoginScreen()));
 
     });
   }

@@ -354,28 +354,6 @@ class _hostacarpageState extends State<hostacarpage> {
 
                 ),
               ),
-          const SizedBox(height: 20,),
-
-          ElevatedButton(
-                onPressed: () {
-                  Navigator.push(context,MaterialPageRoute(builder: (c) => const LoginScreen()));
-                },
-
-
-
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.lightGreenAccent,
-                ),
-                child: const Text
-                  (
-                  "back to login",
-                  style: TextStyle(
-                    color: Colors.black54,
-                    fontSize: 18,
-                  ),
-
-                ),
-              ),
             ],
 
           ),

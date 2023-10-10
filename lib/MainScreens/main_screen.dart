@@ -41,7 +41,7 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
   void initState(){
     super.initState();
 
-    tabController = TabController(length: 6, vsync: this);
+    tabController = TabController(length: 4, vsync: this);
   }
   @override
   Widget build(BuildContext context) {
@@ -56,8 +56,6 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
          hostacarpage(),
          rentacarpage(),
          profilepage(),
-         signupscreen(),
-         LoginScreen(),
        ],
      ),
       bottomNavigationBar: BottomNavigationBar(
@@ -81,15 +79,6 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
             label: "profile",
-          ),
-
-          BottomNavigationBarItem(
-            icon: Icon(Icons.login),
-            label: "signup screen",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.login),
-            label: "login screen",
           ),
         ],
         unselectedItemColor: Colors.white54,
