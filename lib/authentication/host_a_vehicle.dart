@@ -243,35 +243,6 @@ class _hostacarpageState extends State<hostacarpage> {
                 }).toList(),
               ),
               const SizedBox(height: 20,),
-              DropdownButton(
-                dropdownColor: Colors.white24,
-                hint: const Text(
-                    "Please choose Car Type",
-                    style: TextStyle(
-                      fontSize: 14.0,
-                      color: Colors.grey,
-
-                    )
-                ),
-                value: selectedCarType,
-                onChanged: (newValue) {
-                  setState(() {
-                    selectedCarType = newValue.toString();
-                  });
-                },
-                items: carTypesList.map((car) {
-                  return DropdownMenuItem(
-                    child: Text(
-                      car,
-                      style: const TextStyle(
-                          color: Colors.grey
-                      ),
-                    ),
-                    value: car,
-                  );
-                }).toList(),
-              ),
-
 
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -354,6 +325,26 @@ class _hostacarpageState extends State<hostacarpage> {
 
                 ),
               ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(context,MaterialPageRoute(builder: (c) => const MainScreen()));
+                },
+                //Navigator.push(context,MaterialPageRoute(builder: (c) => const MainScreen()));
+
+
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.lightGreenAccent,
+                ),
+                child: const Text
+                  (
+                  "Rturn to home page",
+                  style: TextStyle(
+                    color: Colors.black54,
+                    fontSize: 18,
+                  ),
+
+                ),
+              ),
             ],
 
           ),
@@ -407,11 +398,9 @@ class _hostacarpageState extends State<hostacarpage> {
             "SELECT * FROM vehicle WHERE V_num = '$vcheiclenum1'");
         //owner_pass= '$pass1'
 
-
         if (res.numOfRows == 1) {
           Fluttertoast.showToast(msg: "this vehicle is already registered.");
           print("vehicle is found");
-          Navigator.pop(context);
         }
         else {
           print("vehicle is not found");

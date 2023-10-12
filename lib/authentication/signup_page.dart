@@ -1,13 +1,25 @@
+
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:mysql_client/exception.dart';
 import 'package:pvers_customer/authentication/host_a_vehicle.dart';
 import 'package:pvers_customer/authentication/login_screen.dart';
 import 'dart:async';
+import 'dart:io';
 import 'package:mysql_client/mysql_client.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:pvers_customer/tab_pages/home_tab.dart';
 import 'package:pvers_customer/widgets/progress_dialog.dart';
 import 'package:get/get_utils/get_utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/intl.dart';
+import 'package:image_picker/image_picker.dart';
+
+import '../MainScreens/main_screen.dart';
+
+
 
 class signupscreen extends StatefulWidget {
 
@@ -19,15 +31,22 @@ class signupscreen extends StatefulWidget {
 class _signupscreenState extends State<signupscreen> {
 
 
-
   TextEditingController idTextEditingController = TextEditingController();
   TextEditingController nameTextEditingController = TextEditingController();
   TextEditingController phoneTextEditingController = TextEditingController();
   TextEditingController passTextEditingController = TextEditingController();
   TextEditingController emailTextEditingController = TextEditingController();
-
+  TextEditingController dateTextEditingController = TextEditingController();
+  TextEditingController imageTextEditingController = TextEditingController();
+  Timer? _timer;
+  DateTime DateTime_1 = DateTime.now();
+  File? _imageFile;
+  String _imageString = '';
+  bool isChecked = false;
+  Duration? DateTime_2;
 
   validateForm() async {
+    int years = DateTime_2!.inDays~/ 365;
     if (!idTextEditingController.text.startsWith("1")) {
       Fluttertoast.showToast(msg: "ID must start with 1.");
     }
@@ -53,6 +72,7 @@ class _signupscreenState extends State<signupscreen> {
     else if (!GetUtils.isPhoneNumber(phoneTextEditingController.text)) {
       Fluttertoast.showToast(msg: "the phone must start with 05.");
     }
+
     else if (passTextEditingController.text.length <= 8) {
       Fluttertoast.showToast(msg: "password must be at least 8 Characters.");
     }
@@ -61,17 +81,24 @@ class _signupscreenState extends State<signupscreen> {
       Fluttertoast.showToast(msg: "phone must be 10 digit.");
     }
 
+    else if (years <= 18){
+      Fluttertoast.showToast(msg: "your age must be at least 18");
+    }
+
     else {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
 
-      
-      showDialog(
+
+      /*showDialog(
           context: context,
           barrierDismissible: false,
           builder: (BuildContext c) {
+            _timer = Timer(Duration(seconds: 5), () {
+              Navigator.of(context).pop();
+            });
             return ProgressDialo(message: "Processing, Please wait",);
           }
-      );
+      );*/
       var id = idTextEditingController.text;
       print("Connecting to mysql server...");
 
@@ -104,9 +131,61 @@ class _signupscreenState extends State<signupscreen> {
     }
   }
 
+  void showDatePicker1() {
+    showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(1950),
+      lastDate: DateTime(2025),
+    ).then((value) {
+      setState(() {
+        DateTime_1 = value!;
+        DateTime now = DateTime.now();
+        DateTime_2 = now.difference(value!);
+      });
+    });
+    final DateFormat formatter = DateFormat('yyyy-MM-dd');
+    String? finaldate1 = formatter.format(DateTime_1);
+    print("the date is$finaldate1.toString()");
+    dateTextEditingController.text = finaldate1.toString();
+  }
+
+  //String? contents =  imageTemp.readAsString();
+  Future<void> _imageToString() async {
+    try {
+      if (_imageFile != null) {
+        List<int> imageBytes = await _imageFile!.readAsBytes();
+        String base64String = base64Encode(imageBytes);
+
+        setState(() {
+          _imageString = base64String;
+        });
+
+        print('Image converted to string: $_imageString');
+      }
+    } catch (e) {
+      print('Error converting image to string: $e');
+    }
+  }
+
+  Future<void> _pickImage() async {
+    final pickedFile = await ImagePicker().pickImage(
+        source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      setState(() {
+        _imageFile = File(pickedFile.path);
+      });
+
+      // Convert the image file to a string
+      _imageToString();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    //File imageFile = File(imageTemp!); // Replace with your image file path
+
     return Scaffold(
       backgroundColor: Colors.black,
       body: SingleChildScrollView(
@@ -303,17 +382,108 @@ class _signupscreenState extends State<signupscreen> {
 
               ),
 
-              const SizedBox(height: 20,),
-              ElevatedButton(
-                onPressed: () {
-                  validateForm();
+              TextField(
+                controller: dateTextEditingController,
+                onTap: () {
+                  showDatePicker1();
                 },
-                style:
-                ElevatedButton.styleFrom(
-                  backgroundColor: Colors.lightGreenAccent,
+                style: TextStyle(
+                  color: Colors.grey,
+                ),
+                decoration: InputDecoration(
+                  labelText: "date",
+                  hintText: "date",
+
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white),
+
+                  ),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white),
+
+                  ),
+                  hintStyle: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 14,
+                  ),
+
+                  labelStyle: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 14,
+                  ),
+
                 ),
 
-                child: Text
+
+              ),
+              TextField(
+                controller: imageTextEditingController,
+                onTap: () {
+                  _pickImage();
+                },
+                readOnly: true,
+                style: TextStyle(
+                  color: Colors.grey,
+                ),
+                decoration: InputDecoration(
+                  labelText: "image",
+                  hintText: "image",
+
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white),
+
+                  ),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white),
+
+                  ),
+                  hintStyle: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 14,
+                  ),
+
+                  labelStyle: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 14,
+                  ),
+
+                ),
+
+
+              ),
+
+              const SizedBox(height: 20,),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Checkbox(
+                      activeColor: Colors.green,
+                      value: isChecked,
+                      onChanged: (bool? value){
+
+                        setState(() {
+                          isChecked = value!;
+                        });
+                      }),
+                  const Text("I agree to the terms of service",style: TextStyle(
+                    color: Colors.white,
+                  ),
+                  ),
+        ]),
+
+                  const SizedBox(height: 20,),
+
+                  ElevatedButton(
+                  onPressed: () {
+                  validateForm();
+                  },
+                  style:
+                  ElevatedButton.styleFrom(
+                  backgroundColor: Colors.lightGreenAccent,
+                  ),
+
+                  child: Text
                   (
                   "Create Account",
                   style: TextStyle(
@@ -334,9 +504,14 @@ class _signupscreenState extends State<signupscreen> {
                       MaterialPageRoute(builder: (c) => LoginScreen()));
                 },
               ),
-            ],
+
+
+
+
+
+                ],
+              )
           ),
-        ),
       ),
     );
   }
@@ -350,17 +525,25 @@ class _signupscreenState extends State<signupscreen> {
         userName: 'root',
         password: 'root',
         databaseName: 'pvers');
+    /*host: 'pvers.mysql.database.azure.com',
+        port: 3306,
+        userName: 'nawaf',
+        password: 'wI@AyQmT7Xd3WbIJ',
+        databaseName: 'pvers');*/
 
     await conn.connect();
     print("Connected");
     var res = await conn.execute(
-      "INSERT INTO owner (owner_id,owner_name,owner_phonenum,owner_email,owner_pass) VALUES (:id1, :name1, :phone1, :email1, :pass1)",
+      "INSERT INTO owner (owner_id,owner_name,owner_phonenum,owner_email,owner_pass,owner_bdate,owner_id_picture,owner_tos_agreement) VALUES (:id1, :name1, :phone1, :email1, :pass1, :date1, :image1, :tos1)",
       {
         "id1": idTextEditingController.text.trim(),
         "name1": nameTextEditingController.text.trim(),
         "phone1": phoneTextEditingController.text.trim(),
         "email1": emailTextEditingController.text.trim(),
         "pass1": passTextEditingController.text.trim(),
+        "date1": dateTextEditingController.text.trim(),
+        "image1": _imageString,
+        "tos1": isChecked,
       },
     );
     print(res.affectedRows);
@@ -368,10 +551,9 @@ class _signupscreenState extends State<signupscreen> {
     await conn.close();
     Fluttertoast.showToast(msg: "the user registered successfully");
 
-    Navigator.pop(context);
     send();
-    Navigator.push(context,MaterialPageRoute(builder: (c) => const hostacarpage()));
-
+    Navigator.push(
+        context, MaterialPageRoute(builder: (c) => const MainScreen()));
   }
 
   Future<void> send() async {
@@ -387,5 +569,6 @@ class _signupscreenState extends State<signupscreen> {
       bcc: ['www.mt222arab.com@gmail.com'],
 
     );*/
-  }
-}
+
+
+  }}

@@ -177,7 +177,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if(res.numOfRows ==1){
       print("user is found");
-      SharedPreferences.setMockInitialValues({});
 
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString('ID1', id1);

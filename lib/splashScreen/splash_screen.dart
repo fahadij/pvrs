@@ -3,9 +3,12 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:pvers_customer/MainScreens/main_screen.dart';
 import 'package:pvers_customer/authentication/signup_page.dart';
+import 'package:pvers_customer/tab_pages/home_tab.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../authentication/login_screen.dart';
+import '../authentication/FAQ.dart';
+import '../FAQ_page.dart';
 
 class MySplashScreen extends StatefulWidget
 {
@@ -21,21 +24,39 @@ class MySplashScreen extends StatefulWidget
 class _MySplashScreenState extends State<MySplashScreen>
 
 {
-
-  startTimer(){
-    Timer(const Duration(seconds: 3),() async
-    {
-      //send user to home screen
-      Navigator.push(context, MaterialPageRoute(builder: (c)=> LoginScreen()));
-
-    });
-  }
- @override
+  var ID;
+  @override
   void initState() {
     super.initState();
 
     startTimer();
+
   }
+
+  startTimer(){
+    Timer(const Duration(seconds: 3),() async
+    {
+      SharedPreferences pref = await SharedPreferences.getInstance();
+      setState(() {
+        ID = pref.getString("ID1");
+        print('signed in id is: $ID');
+      });
+
+      if(await ID != null ){
+
+        Navigator.push(context, MaterialPageRoute(builder: (c)=> MainScreen()));
+
+      } else{
+
+        Navigator.push(context, MaterialPageRoute(builder: (c)=> LoginScreen()));
+
+      }
+      //send user to home screen
+
+
+    });
+  }
+
 
   @override
   Widget build(BuildContext context) {

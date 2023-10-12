@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get_utils/src/get_utils/get_utils.dart';
@@ -5,6 +7,7 @@ import 'package:mysql_client/mysql_client.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../authentication/login_screen.dart';
+import '../authentication/FAQ.dart';
 import '../widgets/progress_dialog.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -22,25 +25,31 @@ class _profilepageState extends State<profilepage> {
   TextEditingController passTextEditingController = TextEditingController();
   TextEditingController emailTextEditingController = TextEditingController();
   String? token;
+  String? token2;
+  Timer? _timer;
+
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     getCred();
-    //getdata();
+    getdata();
   }
-  void getCred() async{
+
+  void getCred() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      token= pref.getString("ID1")!;
-      idTextEditingController.text =  token!;
+      token = pref.getString("ID1")!;
+      idTextEditingController.text = token!;
+      token2 = pref.getString("ID1")!;
       //nameTextEditingController.text =
     });
   }
+
   @override
   validateForm() async {
-
-     if (nameTextEditingController.text.length < 3) {
+    if (nameTextEditingController.text.length < 3) {
       Fluttertoast.showToast(msg: "name must be at least 3 Characters.");
     }
 
@@ -70,10 +79,12 @@ class _profilepageState extends State<profilepage> {
           context: context,
           barrierDismissible: false,
           builder: (BuildContext c) {
+            _timer = Timer(Duration(seconds: 5), () {
+              Navigator.of(context).pop();
+            });
             return ProgressDialo(message: "Processing, Please wait",);
-          }
-      );
-      update();
+          });
+      update1();
     }
   }
 
@@ -296,6 +307,25 @@ class _profilepageState extends State<profilepage> {
 
                 ),
               ),
+              ElevatedButton(
+                onPressed: () {
+                  FAQScreen();
+                },
+                style:
+                ElevatedButton.styleFrom(
+                  backgroundColor: Colors.lightGreenAccent,
+                ),
+
+                child: Text
+                  (
+                  "Go to FAQ page",
+                  style: TextStyle(
+                    color: Colors.black54,
+                    fontSize: 18,
+                  ),
+
+                ),
+              ),
 
               ElevatedButton(
                 onPressed: () {
@@ -316,22 +346,43 @@ class _profilepageState extends State<profilepage> {
 
                 ),
               ),
+
+              ElevatedButton(
+                onPressed: () {
+                  getCred();
+                  getdata();
+                },
+                style:
+                ElevatedButton.styleFrom(
+                  backgroundColor: Colors.lightGreenAccent,
+                ),
+
+                child: Text
+                  (
+                  "Get Account data",
+                  style: TextStyle(
+                    color: Colors.black54,
+                    fontSize: 18,
+                  ),
+
+                ),
+              ),
             ],
           ),
         ),
       ),
     );
   }
+
   Future<void> Logout() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     await prefs.remove('ID1');
-    Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder: (c) => const LoginScreen()), (route) => false );
-
-
-
-
+    Navigator.pushAndRemoveUntil(
+        context, MaterialPageRoute(builder: (c) => const LoginScreen()), (
+        route) => false);
   }
+
   Future<void> getdata() async {
     print("Connecting to mysql server...");
 
@@ -345,56 +396,50 @@ class _profilepageState extends State<profilepage> {
     await conn.connect();
     print("Connected");
     var res = await conn.execute(
-      "SELECT * owner WHERE owner_id ='$token'",
-      {
-        "id1": idTextEditingController.text.trim(),
-        "name1": nameTextEditingController.text.trim(),
-        "phone1": phoneTextEditingController.text.trim(),
-        "email1": emailTextEditingController.text.trim(),
-        "pass1": passTextEditingController.text.trim(),
-      },
+        "SELECT * FROM owner WHERE owner_id = $token2 "
     );
-    print(res.affectedRows);
 
-    await conn.close();
-    Fluttertoast.showToast(msg: "the user updated successfully");
+    for (final row in res.rows) {
+      final data = {
+        setState(() {
+          nameTextEditingController.text = row.colAt(1)!;
+          phoneTextEditingController.text = row.colAt(2)!;
+          emailTextEditingController.text = row.colAt(4)!;
+          passTextEditingController.text = row.colAt(6)!;
+        }),
+      };
 
-    Navigator.pop(context);
+
+      await conn.close();
+    }
   }
 
 
-  Future<void> update() async {
-    print("Connecting to mysql server...");
+    Future<void> update1() async {
+      print("Connecting to mysql server...");
 
-    final conn = await MySQLConnection.createConnection(
-        host: '10.0.2.2',
-        port: 3306,
-        userName: 'root',
-        password: 'root',
-        databaseName: 'pvers');
-     String name1 = nameTextEditingController.text.trim();
-     String phone1 = phoneTextEditingController.text.trim();
-     String email1 = emailTextEditingController.text.trim();
-     String pass1 = passTextEditingController.text.trim();
+      final conn = await MySQLConnection.createConnection(
+          host: '10.0.2.2',
+          port: 3306,
+          userName: 'root',
+          password: 'root',
+          databaseName: 'pvers');
+      String name1 = nameTextEditingController.text.trim();
+      String phone1 = phoneTextEditingController.text.trim();
+      String email1 = emailTextEditingController.text.trim();
+      String pass1 = passTextEditingController.text.trim();
 
-    await conn.connect();
-    print("Connected");
-    var res = await conn.execute(
-      "UPDATE owner SET owner_name = '$name1' , owner_phonenum = '$phone1' , owner_email = '$email1' , owner_pass = '$pass1' WHERE owner_id = '$token' ");
-    Navigator.pop(context);
-
+      await conn.connect();
+      print("Connected");
+      var res = await conn.execute(
+          "UPDATE owner SET owner_name = '$name1' , owner_phonenum = '$phone1' , owner_email = '$email1' , owner_pass = '$pass1' WHERE owner_id = '$token' ");
 
 
+      await conn.close();
+      Fluttertoast.showToast(msg: "the user updated successfully");
 
-    await conn.close();
-    Fluttertoast.showToast(msg: "the user updated successfully");
 
-    Navigator.pop(context);
+    }
   }
-
-
-  }
-
-
 
 
