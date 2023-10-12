@@ -2,13 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:pvers_customer/MainScreens/main_screen.dart';
-import 'package:pvers_customer/authentication/signup_page.dart';
-import 'package:pvers_customer/tab_pages/home_tab.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../authentication/login_screen.dart';
-import '../authentication/FAQ.dart';
-import '../FAQ_page.dart';
 
 class MySplashScreen extends StatefulWidget
 {

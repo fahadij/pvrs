@@ -7,10 +7,10 @@ import 'package:pvers_customer/tab_pages/rent_a_car.dart';
 
 
 
+import '../authentication/Complaine_page.dart';
 import '../authentication/FAQ.dart';
 import '../authentication/Payment_page.dart';
 import '../authentication/signup_page.dart';
-import '../FAQ_page.dart';
 
 class MainScreen extends StatefulWidget
 {
@@ -21,7 +21,40 @@ class MainScreen extends StatefulWidget
   @override
   State<MainScreen> createState() => _MainScreenState();
 }
+/*final Completer<GoogleMapController> _controllerGoogleMap = Completer<GoogleMapController>();
+  GoogleMapController? newGoogleMapController;*/
 
+//for dark mode
+
+/*static const CameraPosition _kLake = CameraPosition(
+      bearing: 192.8334901395799,
+      target: LatLng(37.43296265331129, -122.08832357078792),
+      tilt: 59.440717697143555,
+      zoom: 19.151926040649414);
+
+
+      Future<void> _fetchVehicles() async {
+    print("Connecting to MySQL server...");
+    final MySqlConnection conn = await MySqlConnection.connect(ConnectionSettings(
+      host: '10.0.2.2', // e.g., '10.0.2.2'
+      port: 3306,
+      user: 'root',
+      db: 'pvers',
+      password: 'root',
+    ));
+    print("Connected");
+    var results = await conn.query('SELECT * FROM vehicle');
+
+    for (var row in results) {
+      setState(() {
+        vehicles.add(row.fields); // Assuming fields is a Map
+      });
+    }
+
+    await conn.close();
+  }
+
+      */
 
 
 
@@ -45,7 +78,7 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
   void initState(){
     super.initState();
 
-    tabController = TabController(length: 6, vsync: this);
+    tabController = TabController(length: 7, vsync: this);
   }
   @override
   Widget build(BuildContext context) {
@@ -58,10 +91,11 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
        children:  [
          hometabpage(),
          hostacarpage(),
-         rentacarpage(),
+         VehicleRenterPage(),
          profilepage(),
          FAQScreen(),
          PaymentPage(),
+         Complaints_page(),
        ],
      ),
       bottomNavigationBar: BottomNavigationBar(
@@ -82,19 +116,25 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
             label: "Rent a car",
           ),
 
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: "profile",
-          ),
+
 
           BottomNavigationBarItem(
             icon: Icon(Icons.question_answer),
             label: "QA",
           ),
           BottomNavigationBarItem(
+            icon: Icon(Icons.speaker),
+            label: "Complaints page",
+          ),
+          BottomNavigationBarItem(
             icon: Icon(Icons.credit_card),
             label: "Payment",
           ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: "profile",
+          ),
+
         ],
         unselectedItemColor: Colors.white54,
         selectedItemColor: Colors.white,

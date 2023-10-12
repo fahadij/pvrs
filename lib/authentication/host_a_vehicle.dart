@@ -217,7 +217,7 @@ class _hostacarpageState extends State<hostacarpage> {
               DropdownButton(
                 dropdownColor: Colors.white24,
                 hint: const Text(
-                    "Please choose Car Type",
+                    "Please choose Vehicle Type",
                     style: TextStyle(
                       fontSize: 14.0,
                       color: Colors.grey,
@@ -368,7 +368,7 @@ class _hostacarpageState extends State<hostacarpage> {
     }
 
     else if(selectedCarType == null) {
-      Fluttertoast.showToast(msg: "the car type must not be empty.");
+      Fluttertoast.showToast(msg: "the Vehicle type must not be empty.");
 
 
     }
@@ -440,7 +440,7 @@ class _hostacarpageState extends State<hostacarpage> {
     print(res.affectedRows);
 
     await conn.close();
-    Fluttertoast.showToast(msg: "the car registered successfully");
+    Fluttertoast.showToast(msg: "the Vehicle registered successfully");
     Navigator.pop(context);
   }
 }
