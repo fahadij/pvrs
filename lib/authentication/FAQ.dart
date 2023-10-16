@@ -23,8 +23,16 @@ class FAQScreen extends StatefulWidget {
 class _FAQScreenState extends State<FAQScreen> {
   List<Map<String, String>> faqs = [
     {
-      'question': 'What is Flutter?',
-      'answer': 'Flutter is an open-source UI software development toolkit created by Google.'
+      'question': 'what is the age limit?',
+      'answer': 'because you can''t register in the app without an id photo and a payment methed to pay we require all users of the app to be 18 and above.'
+    },
+    {
+    'question': 'how can i register?',
+    'answer': 'Creating an PVRS account is easy! You need to be at least 18 years of age and have the following:-A valid national ID or iqama ID -A valid credit or debit card.'
+    },
+    {
+     'question': 'when will i get charged?',
+     'answer': 'For the Booking fee you will be chagred as soon as you place a Booking request.'
     },
     {
       'question': 'How to add an FAQ?',

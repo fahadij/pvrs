@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:mysql_client/mysql_client.dart';
@@ -7,6 +9,8 @@ import 'package:pvers_customer/authentication/signup_page.dart';
 import 'package:pvers_customer/global/global.dart';
 import 'package:pvers_customer/tab_pages/home_tab.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../widgets/progress_dialog.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -156,6 +160,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   }
   Future<void> _insert() async{
+
     var id1 = idTextEditingController.text;
     var pass1 = passTextEditingController.text;
     var owner_pass = '';

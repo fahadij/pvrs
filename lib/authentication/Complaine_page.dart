@@ -231,7 +231,7 @@ class _FAQScreenState extends State<Complaints_page> {
     await conn.connect();
     print("this is a test help $select");
     var result = await conn.execute(
-        "SELECT * FROM faq WHERE FAQ_Headline = '$select' "); //idk why it errors out
+        "SELECT * FROM complaints WHERE complaint_sub = '$select' "); //idk why it errors out
     print(result.affectedRows);
     for (final row in result.rows) {
       final data = {
@@ -244,7 +244,7 @@ class _FAQScreenState extends State<Complaints_page> {
       print("this is a test $test");
 
       var res = await conn.execute(
-        "UPDATE faq (FAQ_Headline,FAQ_Content,FAQ_num) VALUES (:vid1, :vn1, :num1) FAQ_num = $test",
+        "UPDATE complaints (complaint_sub,complaint_description) VALUES (:vid1, :vn1)",
         {
           "vid1": questionController.text.trim(),
           "vn1": answerController.text.trim(),

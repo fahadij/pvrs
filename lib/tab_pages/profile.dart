@@ -6,6 +6,8 @@ import 'package:get/get_utils/src/get_utils/get_utils.dart';
 import 'package:mysql_client/mysql_client.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../authentication/domain/image_show.dart';
+import '../authentication/image_show_user.dart';
 import '../authentication/login_screen.dart';
 import '../authentication/FAQ.dart';
 import '../widgets/progress_dialog.dart';
@@ -27,12 +29,14 @@ class _profilepageState extends State<profilepage> {
   String? token;
   String? token2;
   Timer? _timer;
+  String? _imageLink = "https://www.google.com/images/branding/googlelogo/2x/googlelogo_light_color_92x30dp.png";
 
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    _retrieveImage();
     getCred();
     getdata();
   }
@@ -75,15 +79,7 @@ class _profilepageState extends State<profilepage> {
     }
 
     else {
-      showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (BuildContext c) {
-            _timer = Timer(Duration(seconds: 5), () {
-              Navigator.of(context).pop();
-            });
-            return ProgressDialo(message: "Processing, Please wait",);
-          });
+      Fluttertoast.showToast(msg: "Processing, Please wait");
       update1();
     }
   }
@@ -100,13 +96,31 @@ class _profilepageState extends State<profilepage> {
             children: [
 
               const SizedBox(height: 10,),
-
-              Padding(
-                padding: const EdgeInsets.all(20.0),
-                child: Image.asset("images/logo-color.png"),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Padding(
+                padding: const EdgeInsets.all(10),
+                child: ClipOval(
+                child: Image.asset("images/logo-color.png",
+                  width: 100,
+                  height: 100,
+                ),
+              ),
+              ),
               ),
               const SizedBox(height: 10),
-
+              Align(
+                alignment: Alignment.center,
+                child: Padding(
+                  padding: const EdgeInsets.all(10),
+                  child: ClipOval(
+                    child: Image.network(_imageLink!,
+                      width: 100,
+                      height: 100,
+                    ),
+                  ),
+                ),
+              ),
               const Text(
 
                 "Profile Page",
@@ -309,7 +323,8 @@ class _profilepageState extends State<profilepage> {
               ),
               ElevatedButton(
                 onPressed: () {
-                  FAQScreen();
+                  Navigator.push(
+                      context, MaterialPageRoute(builder: (c) =>  ImageUploadPage()));
                 },
                 style:
                 ElevatedButton.styleFrom(
@@ -318,7 +333,7 @@ class _profilepageState extends State<profilepage> {
 
                 child: Text
                   (
-                  "Go to FAQ page",
+                  "change the image",
                   style: TextStyle(
                     color: Colors.black54,
                     fontSize: 18,
@@ -351,6 +366,7 @@ class _profilepageState extends State<profilepage> {
                 onPressed: () {
                   getCred();
                   getdata();
+                  _retrieveImage();
                 },
                 style:
                 ElevatedButton.styleFrom(
@@ -372,6 +388,33 @@ class _profilepageState extends State<profilepage> {
         ),
       ),
     );
+  }
+  Future<void> _retrieveImage() async {
+    getCred();
+    print("Connecting to mysql server...");
+    final conn = await MySQLConnection.createConnection(
+        host: '10.0.2.2',
+        port: 3306,
+        userName: 'root',
+        password: 'root',
+        databaseName: 'pvers');
+    await conn.connect();
+    print("Connected");
+    final res = await conn.execute(
+        "SELECT owner_picture_link FROM owner WHERE owner_id = $token2 "
+    );
+    for (final row in res.rows) {
+      _imageLink = row.colByName("owner_picture_link");
+    }
+
+    //final row = res.affectedRows;
+    //final imageLink = row['image_link'] as String?;
+
+    await conn.close();
+
+
+
+
   }
 
   Future<void> Logout() async {

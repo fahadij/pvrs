@@ -18,6 +18,7 @@ import 'package:intl/intl.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../MainScreens/main_screen.dart';
+import 'dart:typed_data';
 
 
 
@@ -41,12 +42,14 @@ class _signupscreenState extends State<signupscreen> {
   Timer? _timer;
   DateTime DateTime_1 = DateTime.now();
   File? _imageFile;
-  String _imageString = '';
+  Uint8List? _imageString;
   bool isChecked = false;
   Duration? DateTime_2;
 
   validateForm() async {
     int years = DateTime_2!.inDays~/ 365;
+    print("your age is:$years");
+
     if (!idTextEditingController.text.startsWith("1")) {
       Fluttertoast.showToast(msg: "ID must start with 1.");
     }
@@ -88,17 +91,9 @@ class _signupscreenState extends State<signupscreen> {
     else {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
 
+      Fluttertoast.showToast(msg: "Processing, Please wait");
 
-      /*showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (BuildContext c) {
-            _timer = Timer(Duration(seconds: 5), () {
-              Navigator.of(context).pop();
-            });
-            return ProgressDialo(message: "Processing, Please wait",);
-          }
-      );*/
+
       var id = idTextEditingController.text;
       print("Connecting to mysql server...");
 
@@ -154,11 +149,11 @@ class _signupscreenState extends State<signupscreen> {
   Future<void> _imageToString() async {
     try {
       if (_imageFile != null) {
-        List<int> imageBytes = await _imageFile!.readAsBytes();
-        String base64String = base64Encode(imageBytes);
+        final bytes = await _imageFile!.readAsBytes();
+        Uint8List blob = Uint8List.fromList(bytes);
 
         setState(() {
-          _imageString = base64String;
+          _imageString = blob;
         });
 
         print('Image converted to string: $_imageString');

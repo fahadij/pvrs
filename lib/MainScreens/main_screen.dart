@@ -3,7 +3,7 @@ import 'package:pvers_customer/authentication/login_screen.dart';
 import 'package:pvers_customer/tab_pages/home_tab.dart';
 import 'package:pvers_customer/authentication/host_a_vehicle.dart';
 import 'package:pvers_customer/tab_pages/profile.dart';
-import 'package:pvers_customer/tab_pages/rent_a_car.dart';
+import 'package:pvers_customer/authentication/rent_a_vehicle.dart';
 
 
 
@@ -11,6 +11,8 @@ import '../authentication/Complaine_page.dart';
 import '../authentication/FAQ.dart';
 import '../authentication/Payment_page.dart';
 import '../authentication/signup_page.dart';
+import '../authentication/Select_page.dart';
+import '../authentication/My_vehicle_page.dart';
 
 class MainScreen extends StatefulWidget
 {
@@ -78,7 +80,7 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
   void initState(){
     super.initState();
 
-    tabController = TabController(length: 7, vsync: this);
+    tabController = TabController(length: 8, vsync: this);
   }
   @override
   Widget build(BuildContext context) {
@@ -92,10 +94,11 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
          hometabpage(),
          hostacarpage(),
          VehicleRenterPage(),
-         profilepage(),
          FAQScreen(),
-         PaymentPage(),
          Complaints_page(),
+         PaymentPage(),
+         SelectPage(),
+         profilepage(),
        ],
      ),
       bottomNavigationBar: BottomNavigationBar(
@@ -130,6 +133,11 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
             icon: Icon(Icons.credit_card),
             label: "Payment",
           ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.card_travel),
+            label: "My Vehicles",
+          ),
+
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
             label: "profile",
