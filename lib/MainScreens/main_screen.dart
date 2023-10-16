@@ -38,11 +38,11 @@ class MainScreen extends StatefulWidget
       Future<void> _fetchVehicles() async {
     print("Connecting to MySQL server...");
     final MySqlConnection conn = await MySqlConnection.connect(ConnectionSettings(
-      host: '10.0.2.2', // e.g., '10.0.2.2'
+      host: 'pvers.mysql.database.azure.com', // e.g., '10.0.2.2'
       port: 3306,
       user: 'root',
       db: 'pvers',
-      password: 'root',
+       password: 'wI@AyQmT7Xd3WbIJ',
     ));
     print("Connected");
     var results = await conn.query('SELECT * FROM vehicle');

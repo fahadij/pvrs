@@ -29,16 +29,16 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
     });
     print("Connecting to mysql server...");
     final conn = await MySQLConnection.createConnection(
-        host: '10.0.2.2',
+        host: 'pvers.mysql.database.azure.com',
         port: 3306,
-        userName: 'root',
-        password: 'root',
+        userName: 'nawaf',
+         password: 'wI@AyQmT7Xd3WbIJ',
         databaseName: 'pvers');
 
     await conn.connect();
     print("Connected");
     var results = await conn.execute(
-        "SELECT V_num, V_Name, V_Model, V_Type, V_Location, V_Battery, V_Rate, V_EV, V_Image FROM vehicle WHERE V_num = $token2",);
+        "SELECT V_num, V_Name, V_Model, V_Type, V_Location, V_Battery, V_Rate, V_EV, FROM vehicle WHERE V_num = $token2");
 
     if (results.isNotEmpty) {
       for (final row in results.rows) {

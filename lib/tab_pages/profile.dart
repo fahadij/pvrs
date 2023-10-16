@@ -393,10 +393,10 @@ class _profilepageState extends State<profilepage> {
     getCred();
     print("Connecting to mysql server...");
     final conn = await MySQLConnection.createConnection(
-        host: '10.0.2.2',
+        host: 'pvers.mysql.database.azure.com',
         port: 3306,
-        userName: 'root',
-        password: 'root',
+        userName: 'nawaf',
+         password: 'wI@AyQmT7Xd3WbIJ',
         databaseName: 'pvers');
     await conn.connect();
     print("Connected");
@@ -430,10 +430,10 @@ class _profilepageState extends State<profilepage> {
     print("Connecting to mysql server...");
 
     final conn = await MySQLConnection.createConnection(
-        host: '10.0.2.2',
+        host: 'pvers.mysql.database.azure.com',
         port: 3306,
-        userName: 'root',
-        password: 'root',
+        userName: 'nawaf',
+         password: 'wI@AyQmT7Xd3WbIJ',
         databaseName: 'pvers');
 
     await conn.connect();
@@ -462,10 +462,10 @@ class _profilepageState extends State<profilepage> {
       print("Connecting to mysql server...");
 
       final conn = await MySQLConnection.createConnection(
-          host: '10.0.2.2',
+          host: 'pvers.mysql.database.azure.com',
           port: 3306,
-          userName: 'root',
-          password: 'root',
+          userName: 'nawaf',
+           password: 'wI@AyQmT7Xd3WbIJ',
           databaseName: 'pvers');
       String name1 = nameTextEditingController.text.trim();
       String phone1 = phoneTextEditingController.text.trim();

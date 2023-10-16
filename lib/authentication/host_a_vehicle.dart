@@ -382,10 +382,10 @@ class _hostacarpageState extends State<hostacarpage> {
         print("Connecting to mysql server...");
 
         final conn = await MySQLConnection.createConnection(
-            host: '10.0.2.2',
+            host: 'pvers.mysql.database.azure.com',
             port: 3306,
-            userName: 'root',
-            password: 'root',
+            userName: 'nawaf',
+             password: 'wI@AyQmT7Xd3WbIJ',
             databaseName: 'pvers');
 
         await conn.connect();
@@ -415,10 +415,10 @@ class _hostacarpageState extends State<hostacarpage> {
 
 
     final conn = await MySQLConnection.createConnection(
-        host: '10.0.2.2',
+        host: 'pvers.mysql.database.azure.com',
         port: 3306,
-        userName: 'root',
-        password: 'root',
+        userName: 'nawaf',
+         password: 'wI@AyQmT7Xd3WbIJ',
         databaseName: 'pvers');
 
     await conn.connect();

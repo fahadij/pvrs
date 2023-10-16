@@ -59,10 +59,10 @@ class _ImageUploadPageState extends State<ImageUploadPage> {
 print(_imageLink);
       print("Connecting to mysql server...");
       final conn = await MySQLConnection.createConnection(
-          host: '10.0.2.2',
+          host: 'pvers.mysql.database.azure.com',
           port: 3306,
-          userName: 'root',
-          password: 'root',
+          userName: 'nawaf',
+           password: 'wI@AyQmT7Xd3WbIJ',
           databaseName: 'pvers');
 
       await conn.connect();
@@ -78,10 +78,10 @@ print(_imageLink);
     getCred();
     print("Connecting to mysql server...");
     final conn = await MySQLConnection.createConnection(
-        host: '10.0.2.2',
+        host: 'pvers.mysql.database.azure.com',
         port: 3306,
-        userName: 'root',
-        password: 'root',
+        userName: 'nawaf',
+         password: 'wI@AyQmT7Xd3WbIJ',
         databaseName: 'pvers');
     await conn.connect();
     print("Connected");
