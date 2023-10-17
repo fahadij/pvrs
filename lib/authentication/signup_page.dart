@@ -18,7 +18,6 @@ import 'package:intl/intl.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../MainScreens/main_screen.dart';
-import 'dart:typed_data';
 
 
 
@@ -39,7 +38,6 @@ class _signupscreenState extends State<signupscreen> {
   TextEditingController emailTextEditingController = TextEditingController();
   TextEditingController dateTextEditingController = TextEditingController();
   TextEditingController imageTextEditingController = TextEditingController();
-  Timer? _timer;
   DateTime DateTime_1 = DateTime.now();
   File? _imageFile;
   Uint8List? _imageString;
@@ -98,10 +96,10 @@ class _signupscreenState extends State<signupscreen> {
       print("Connecting to mysql server...");
 
       final conn = await MySQLConnection.createConnection(
-          host: 'pvers.mysql.database.azure.com',
+          host: '10.0.2.2',
           port: 3306,
-          userName: 'nawaf',
-           password: 'wI@AyQmT7Xd3WbIJ',
+          userName: 'root',
+          password: 'root',
           databaseName: 'pvers');
 
       await conn.connect();
@@ -136,7 +134,7 @@ class _signupscreenState extends State<signupscreen> {
       setState(() {
         DateTime_1 = value!;
         DateTime now = DateTime.now();
-        DateTime_2 = now.difference(value!);
+        DateTime_2 = now.difference(value);
       });
     });
     final DateFormat formatter = DateFormat('yyyy-MM-dd');
@@ -515,10 +513,10 @@ class _signupscreenState extends State<signupscreen> {
     print("Connecting to mysql server...");
 
     final conn = await MySQLConnection.createConnection(
-        host: 'pvers.mysql.database.azure.com',
+        host: '10.0.2.2',
         port: 3306,
-        userName: 'nawaf',
-         password: 'wI@AyQmT7Xd3WbIJ',
+        userName: 'root',
+        password: 'root',
         databaseName: 'pvers');
     /*host: 'pvers.mysql.database.azure.com',
         port: 3306,

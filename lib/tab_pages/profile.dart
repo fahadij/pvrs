@@ -9,9 +9,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../authentication/domain/image_show.dart';
 import '../authentication/image_show_user.dart';
 import '../authentication/login_screen.dart';
-import '../authentication/FAQ.dart';
+import 'FAQ.dart';
 import '../widgets/progress_dialog.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class profilepage extends StatefulWidget {
 
@@ -28,7 +27,6 @@ class _profilepageState extends State<profilepage> {
   TextEditingController emailTextEditingController = TextEditingController();
   String? token;
   String? token2;
-  Timer? _timer;
   String? _imageLink = "https://www.google.com/images/branding/googlelogo/2x/googlelogo_light_color_92x30dp.png";
 
 
@@ -393,10 +391,10 @@ class _profilepageState extends State<profilepage> {
     getCred();
     print("Connecting to mysql server...");
     final conn = await MySQLConnection.createConnection(
-        host: 'pvers.mysql.database.azure.com',
+        host: '10.0.2.2',
         port: 3306,
-        userName: 'nawaf',
-         password: 'wI@AyQmT7Xd3WbIJ',
+        userName: 'root',
+        password: 'root',
         databaseName: 'pvers');
     await conn.connect();
     print("Connected");
@@ -430,10 +428,10 @@ class _profilepageState extends State<profilepage> {
     print("Connecting to mysql server...");
 
     final conn = await MySQLConnection.createConnection(
-        host: 'pvers.mysql.database.azure.com',
+        host: '10.0.2.2',
         port: 3306,
-        userName: 'nawaf',
-         password: 'wI@AyQmT7Xd3WbIJ',
+        userName: 'root',
+        password: 'root',
         databaseName: 'pvers');
 
     await conn.connect();
@@ -462,10 +460,10 @@ class _profilepageState extends State<profilepage> {
       print("Connecting to mysql server...");
 
       final conn = await MySQLConnection.createConnection(
-          host: 'pvers.mysql.database.azure.com',
+          host: '10.0.2.2',
           port: 3306,
-          userName: 'nawaf',
-           password: 'wI@AyQmT7Xd3WbIJ',
+          userName: 'root',
+          password: 'root',
           databaseName: 'pvers');
       String name1 = nameTextEditingController.text.trim();
       String phone1 = phoneTextEditingController.text.trim();

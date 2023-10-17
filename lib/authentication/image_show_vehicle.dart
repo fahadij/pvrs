@@ -14,7 +14,6 @@ class ImageUploadPage extends StatefulWidget {
 class _ImageUploadPageState extends State<ImageUploadPage> {
   File? _image;
   String? _imageLink;
-  String? _ownerId;
   String? token;
   String? token2;
   String? token3;
@@ -59,10 +58,10 @@ class _ImageUploadPageState extends State<ImageUploadPage> {
       print(_imageLink);
       print("Connecting to mysql server...");
       final conn = await MySQLConnection.createConnection(
-          host: 'pvers.mysql.database.azure.com',
+          host: '10.0.2.2',
           port: 3306,
-          userName: 'nawaf',
-           password: 'wI@AyQmT7Xd3WbIJ',
+          userName: 'root',
+          password: 'root',
           databaseName: 'pvers');
 
       await conn.connect();
@@ -78,10 +77,10 @@ class _ImageUploadPageState extends State<ImageUploadPage> {
     getCred();
     print("Connecting to mysql server...");
     final conn = await MySQLConnection.createConnection(
-        host: 'pvers.mysql.database.azure.com',
+        host: '10.0.2.2',
         port: 3306,
-        userName: 'nawaf',
-         password: 'wI@AyQmT7Xd3WbIJ',
+        userName: 'root',
+        password: 'root',
         databaseName: 'pvers');
     await conn.connect();
     print("Connected");

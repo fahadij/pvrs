@@ -8,9 +8,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../MainScreens/main_screen.dart';
 import '../authentication/login_screen.dart';
-import '../authentication/FAQ.dart';
+import '../tab_pages/FAQ.dart';
 import '../widgets/progress_dialog.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class vehicle_page extends StatefulWidget {
 
@@ -47,8 +46,8 @@ class _vehicle_page extends State<vehicle_page> {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
       token = pref.getString("ID1")!;
-      idTextEditingController.text = token!;
-      token2 = pref.getString("ID1")!;
+
+      token2 = pref.getString("selectedVIDreft")!;
       //nameTextEditingController.text =
     });
   }
@@ -57,16 +56,16 @@ class _vehicle_page extends State<vehicle_page> {
     print("Connecting to mysql server...");
 
     final conn = await MySQLConnection.createConnection(
-        host: 'pvers.mysql.database.azure.com',
+        host: '10.0.2.2',
         port: 3306,
-        userName: 'nawaf',
-         password: 'wI@AyQmT7Xd3WbIJ',
+        userName: 'root',
+        password: 'root',
         databaseName: 'pvers');
 
     await conn.connect();
     print("Connected");
     var res = await conn.execute(
-        "SELECT * FROM vehicle WHERE owner_id_V = $token2 "
+        "SELECT * FROM vehicle WHERE V_num = $token2 "
     );
 
     for (final row in res.rows) {
@@ -449,10 +448,10 @@ class _vehicle_page extends State<vehicle_page> {
 
 
     final conn = await MySQLConnection.createConnection(
-        host: 'pvers.mysql.database.azure.com',
+        host: '10.0.2.2',
         port: 3306,
-        userName: 'nawaf',
-         password: 'wI@AyQmT7Xd3WbIJ',
+        userName: 'root',
+        password: 'root',
         databaseName: 'pvers');
 
     await conn.connect();
@@ -467,6 +466,5 @@ class _vehicle_page extends State<vehicle_page> {
 
     await conn.close();
     Fluttertoast.showToast(msg: "the Vehicle updated successfully");
-    Navigator.pop(context);
   }
 }

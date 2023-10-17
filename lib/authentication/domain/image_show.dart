@@ -30,11 +30,11 @@ class _ImageDisplayPageState extends State<ImageDisplayPage> {
   Future<void> _fetchImages() async {
     final MySqlConnection connection = await MySqlConnection.connect(
       ConnectionSettings(
-        host: 'pvers.mysql.database.azure.com',
+        host: '10.0.2.2',
         port: 3306,
         user: 'root',
         db: 'pvers',
-         password: 'wI@AyQmT7Xd3WbIJ',
+        password: 'root',
       ),
     );
 

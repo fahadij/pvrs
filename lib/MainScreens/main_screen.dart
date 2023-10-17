@@ -7,8 +7,8 @@ import 'package:pvers_customer/authentication/rent_a_vehicle.dart';
 
 
 
-import '../authentication/Complaine_page.dart';
-import '../authentication/FAQ.dart';
+import '../tab_pages/Complaine_page.dart';
+import '../tab_pages/FAQ.dart';
 import '../authentication/Payment_page.dart';
 import '../authentication/signup_page.dart';
 import '../authentication/Select_page.dart';
@@ -38,11 +38,11 @@ class MainScreen extends StatefulWidget
       Future<void> _fetchVehicles() async {
     print("Connecting to MySQL server...");
     final MySqlConnection conn = await MySqlConnection.connect(ConnectionSettings(
-      host: 'pvers.mysql.database.azure.com', // e.g., '10.0.2.2'
+      host: '10.0.2.2', // e.g., '10.0.2.2'
       port: 3306,
       user: 'root',
       db: 'pvers',
-       password: 'wI@AyQmT7Xd3WbIJ',
+      password: 'root',
     ));
     print("Connected");
     var results = await conn.query('SELECT * FROM vehicle');
@@ -99,6 +99,7 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
          PaymentPage(),
          SelectPage(),
          profilepage(),
+
        ],
      ),
       bottomNavigationBar: BottomNavigationBar(

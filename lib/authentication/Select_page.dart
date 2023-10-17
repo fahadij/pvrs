@@ -3,7 +3,6 @@ import 'package:mysql_client/mysql_client.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'My_vehicle_page.dart';
 import 'domain/format.dart';
-import 'My_vehicle_page.dart';
 
 class SelectPage extends StatefulWidget {
 
@@ -31,6 +30,8 @@ class _SelectPageState extends State<SelectPage> {
 
     setState(() {
       token2 = pref.getString("ID1")!;
+
+
       print(token2);
 
       //nameTextEditingController.text =
@@ -38,24 +39,8 @@ class _SelectPageState extends State<SelectPage> {
   }
 
   List<Map<String, String>> displayList = [];
-  List<Map<String, String>> filteredList = [];
 
 
-  void _filterList(String query) {
-    filteredList.clear();
-    if (query.isNotEmpty) {
-      displayList.forEach((data) {
-        if (data['VID']!.contains(query) ||
-            data['vehicleName']!.contains(query) ||
-            data['vehicleModel']!.contains(query)) {
-          filteredList.add(data);
-        }
-      });
-    } else {
-      filteredList.addAll(displayList);
-    }
-    setState(() {});
-  }
 
   Future<void> _select() async {
     print("Connecting to mysql server...");
@@ -77,7 +62,7 @@ class _SelectPageState extends State<SelectPage> {
     print (token2);
     // make query
     var result = await conn.execute(
-        "SELECT * FROM vehicle WHERE owner_id_V = $token2  ORDER BY V_num ASC");
+        "SELECT V_num,V_Name,V_Model FROM vehicle WHERE owner_id_V = $token2  ORDER BY V_num ASC");
 
     // print some result data
     //print(result.numOfColumns);
@@ -90,16 +75,17 @@ class _SelectPageState extends State<SelectPage> {
     List<Map<String, String>> list = [];
     for (final row in result.rows) {
       final data = {
-        'VID': row.colAt(1)!,
-        'vehicleName': row.colAt(2)!,
-        'vehicleModel': row.colAt(3)!,
+        'VID': row.colByName("V_num")!,
+        'vehicleName': row.colByName("V_Name")!,
+        'vehicleModel': row.colByName("V_Model")!,
       };
       list.add(data);
       vid =row.colAt(0)!;
-
+      print(vid);
+      //await pref.setString('selectedVID', vid);
     }
     print('je suis la');
-    print(vid);
+    print(list);
 
     setState(() {
       displayList = list;
@@ -120,26 +106,17 @@ class _SelectPageState extends State<SelectPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-
-
+          automaticallyImplyLeading: false,
+          title: Text('My Vehicle page')
       ),
       body: Column(
           children:[
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                controller: searchController,
-                decoration: const InputDecoration(
-                  labelText: 'Search by Car Number, Model, Type, or Electric',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-            ),
+
             Expanded(
               flex: 3,
               child: SingleChildScrollView(
                 child:
-                Column(children: filteredList.map<Widget>((data) {
+                Column(children: displayList.map<Widget>((data) {
                   return Card(
                       child: ListTile(
                         leading: Text(data['VID']?? ""),
@@ -147,7 +124,9 @@ class _SelectPageState extends State<SelectPage> {
                         subtitle: Text(data['vehicleModel']?? ""),
                         trailing: TextButton(
                           child: const Text("update"),
-                          onPressed: () {
+                          onPressed: () async {
+                            SharedPreferences pref = await SharedPreferences.getInstance();
+                            pref.setString('selectedVIDreft', data['VID'] ?? ""); // Save the selected VID
                             Navigator.push(
                               context,
                               MaterialPageRoute(builder: (context) => vehicle_page()),
@@ -164,12 +143,6 @@ class _SelectPageState extends State<SelectPage> {
               ),
             ),
           ]),
-
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _select,
-        tooltip: 'select',
-        label: const Text("select"),
-      ),
     );
   }
 }

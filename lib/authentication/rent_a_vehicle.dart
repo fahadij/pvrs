@@ -5,7 +5,6 @@ import 'package:pvers_customer/tab_pages/home_tab.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'My_vehicle_page.dart';
 import 'domain/format.dart';
-import 'My_vehicle_page.dart';
 
 class VehicleRenterPage extends StatefulWidget {
 
@@ -39,6 +38,8 @@ class _SelectPageState extends State<VehicleRenterPage> {
   List<Map<String, String>> displayList = [];
   List<Map<String, String>> filteredList = [];
   List<Map<String, String>> tempList1 = [];
+  bool isTextFieldFocused = false;
+
   final TextEditingController searchController = TextEditingController();
 
 
@@ -75,16 +76,15 @@ class _SelectPageState extends State<VehicleRenterPage> {
     List<Map<String, String>> list = [];
     for (final row in result.rows) {
       final data = {
-        'VID': row.colAt(1)!,
-        'vehicleName': row.colAt(2)!,
-        'vehicleModel': row.colAt(3)!,
+        'VID': row.colByName("V_num")!,
+        'vehicleName': row.colByName("V_Name")!,
+        'vehicleModel': row.colByName("V_Model")!,
         'V_EV': row.colByName("V_EV")!
       };
       list.add(data);
       vid =row.colAt(0)!;
 
     }
-    print('je suis la');
     print(vid);
 
     setState(() {
@@ -106,7 +106,8 @@ class _SelectPageState extends State<VehicleRenterPage> {
   }
   void _saveVID(String vid) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('selectedVID', vid);
+    await prefs.setString('selectedVIDreft', vid);
+    print(vid);
   }
 
   void _filterList(String query) {
@@ -150,11 +151,16 @@ class _SelectPageState extends State<VehicleRenterPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          automaticallyImplyLeading: false
+          automaticallyImplyLeading: false,
+          title: Text('rent a car page')
       ),
       body: Column(
           children:[
-            TextField(
+             GestureDetector(
+               onTap:() {
+
+             },
+              child:TextField(
               controller: searchController,
               decoration: InputDecoration(
                 labelText: 'Search by Car Number, Model, Type, or Electric',
@@ -162,6 +168,16 @@ class _SelectPageState extends State<VehicleRenterPage> {
                 prefixIcon: Icon(Icons.search),
               ),
               onChanged: _filterList,
+                onTap: (){
+              setState(() {
+              isTextFieldFocused = true;
+              });
+              },
+                  onEditingComplete: () {
+                    setState(() {
+                      isTextFieldFocused = false;
+                    });
+                  },),
             ),
             Expanded(
               flex: 3,
@@ -190,12 +206,15 @@ class _SelectPageState extends State<VehicleRenterPage> {
               ),
             ),
           ]),
-
-    floatingActionButton: FloatingActionButton.extended(
+    floatingActionButton: Visibility(
+        visible: isTextFieldFocused,
+        child: FloatingActionButton.extended(
     onPressed: _search,
     tooltip: 'Search',
     label: const Text("Search"),
     icon: const Icon(Icons.search),
-    ));
+    )
+    )
+    );
   }
 }

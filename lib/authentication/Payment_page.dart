@@ -3,36 +3,11 @@ import 'package:mysql1/mysql1.dart';
 import 'package:mysql_client/mysql_client.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../MainScreens/main_screen.dart';
 
 
-Future<void> makePayment(double amount, String cardNumber, String expirationDate,String? userId ) async {
-  print("Connecting to mysql server...");
 
-  final conn = await MySQLConnection.createConnection(
-      host: 'pvers.mysql.database.azure.com',
-      port: 3306,
-      userName: 'nawaf',
-       password: 'wI@AyQmT7Xd3WbIJ',
-      databaseName: 'pvers');
-  print("Connected");
 
-  DateTime now = DateTime.now();
-
-  String formattedDate = "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')} ${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}:${now.second.toString().padLeft(2, '0')}";
-  await conn.connect();
-  var res = await conn.execute(
-    "INSERT INTO invoice (invoice_total_price, card_number, expiration_date, user_id, invoice_date) VALUES (:vid1, :vn, :vm, :ev, :et)",
-      {
-        "vid1": amount,
-        "vn": cardNumber,
-        "vm": expirationDate,
-        "ev": userId,
-        "et": formattedDate,
-      }
-  );
-  print(res.affectedRows);
-  await conn.close();
-}
 
 
 
@@ -42,20 +17,63 @@ class PaymentPage extends StatefulWidget {
 }
 
 class _PaymentPageState extends State<PaymentPage> {
+  TextEditingController amountController = TextEditingController();
+  TextEditingController cardNumberController = TextEditingController();
+  TextEditingController expirationController = TextEditingController();
   String? token21;
   String? userId;
+
+ void  initState(){
+   getCred();
+  }
   getCred() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
          
       userId = pref.getString("ID1");
       print("this is the id that is conected$userId");
+      amountController.text = pref.getString("TotalPrice")!;
+      var test = pref.getString("TotalPrice");
+      print("this is the full price for the rent$test");
       //nameTextEditingController.text =
     });
   }
-  TextEditingController amountController = TextEditingController();
-  TextEditingController cardNumberController = TextEditingController();
-  TextEditingController expirationController = TextEditingController();
+
+  Future<void> makePayment(double amount, String cardNumber, String expirationDate,String? userId ) async {
+    print("Connecting to mysql server...");
+
+    final conn = await MySQLConnection.createConnection(
+        host: '10.0.2.2',
+        port: 3306,
+        userName: 'root',
+        password: 'root',
+        databaseName: 'pvers');
+    print("Connected");
+    String? expirationDate = expirationController.text;
+
+    DateTime now = DateTime.now();
+DateTime now2 = DateTime.now();
+    int? day = now2.day;
+    List<String> dateParts = expirationDate.split('/');
+    String year = dateParts[1];
+    String month = dateParts[0];
+    String date = "20$year-$month-$day";
+    print(date);
+    DateTime formattedDate = DateTime.now();
+    await conn.connect();
+    var res = await conn.execute(
+        "INSERT INTO invoice (invoice_total_price, card_number, expiration_date, user_id, invoice_date) VALUES (:vid1, :vn, :vm, :ev, :et)",
+        {
+          "vid1": amount,
+          "vn": cardNumber,
+          "vm": date,
+          "ev": userId,
+          "et": formattedDate,
+        }
+    );
+    print(res.affectedRows);
+    await conn.close();
+  }
 
   void makePaymentAndNavigate() async {
     double amount = double.parse(amountController.text);
@@ -63,6 +81,8 @@ class _PaymentPageState extends State<PaymentPage> {
     String expirationDate = expirationController.text;
     // Assuming user ID is 1 for this example.
     getCred();
+    DateTime now = DateTime.now();
+
     await makePayment(amount, cardNumber, expirationDate, userId);
 
     // Navigate to homepage after payment
@@ -79,6 +99,7 @@ class _PaymentPageState extends State<PaymentPage> {
           children: [
             TextField(
               controller: amountController,
+              readOnly: true,
               keyboardType: TextInputType.numberWithOptions(decimal: true),
               decoration: InputDecoration(labelText: 'Amount'),
             ),
@@ -94,7 +115,12 @@ class _PaymentPageState extends State<PaymentPage> {
             ),
             SizedBox(height: 20.0),
             ElevatedButton(
-              onPressed: makePaymentAndNavigate,
+              onPressed:(){ makePaymentAndNavigate;
+                Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => MainScreen()),
+                );
+              },
               child: Text('Make Payment'),
             ),
           ],

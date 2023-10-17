@@ -382,10 +382,10 @@ class _hostacarpageState extends State<hostacarpage> {
         print("Connecting to mysql server...");
 
         final conn = await MySQLConnection.createConnection(
-            host: 'pvers.mysql.database.azure.com',
+            host: '10.0.2.2',
             port: 3306,
-            userName: 'nawaf',
-             password: 'wI@AyQmT7Xd3WbIJ',
+            userName: 'root',
+            password: 'root',
             databaseName: 'pvers');
 
         await conn.connect();
@@ -415,10 +415,10 @@ class _hostacarpageState extends State<hostacarpage> {
 
 
     final conn = await MySQLConnection.createConnection(
-        host: 'pvers.mysql.database.azure.com',
+        host: '10.0.2.2',
         port: 3306,
-        userName: 'nawaf',
-         password: 'wI@AyQmT7Xd3WbIJ',
+        userName: 'root',
+        password: 'root',
         databaseName: 'pvers');
 
     await conn.connect();
@@ -437,6 +437,5 @@ class _hostacarpageState extends State<hostacarpage> {
 
     await conn.close();
     Fluttertoast.showToast(msg: "the Vehicle registered successfully");
-    Navigator.pop(context);
   }
 }
