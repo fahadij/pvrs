@@ -2,6 +2,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:mysql_client/exception.dart';
 import 'package:pvers_customer/authentication/host_a_vehicle.dart';
@@ -30,6 +31,7 @@ class signupscreen extends StatefulWidget {
 
 class _signupscreenState extends State<signupscreen> {
 
+  String? imageLink_front="";
 
   TextEditingController idTextEditingController = TextEditingController();
   TextEditingController nameTextEditingController = TextEditingController();
@@ -40,9 +42,28 @@ class _signupscreenState extends State<signupscreen> {
   TextEditingController imageTextEditingController = TextEditingController();
   DateTime DateTime_1 = DateTime.now();
   File? _imageFile;
-  Uint8List? _imageString;
   bool isChecked = false;
   Duration? DateTime_2;
+
+
+  Future<void> _uploadImage_front() async {
+    String? id5 = idTextEditingController.text;
+
+      final storageRef = FirebaseStorage.instance.ref().child('images/Users/$id5');
+      final imageName = _imageFile!.path.split('/').last;
+      final imageRef = storageRef.child(imageName);
+
+      final uploadTask = imageRef.putFile(_imageFile!);
+      final snapshot = await uploadTask.whenComplete(() => null);
+      final downloadUrl = await snapshot.ref.getDownloadURL();
+
+      setState(() {
+         imageLink_front = downloadUrl;
+      });
+
+      print(imageLink_front);
+    }
+
 
   validateForm() async {
     int years = DateTime_2!.inDays~/ 365;
@@ -117,11 +138,13 @@ class _signupscreenState extends State<signupscreen> {
       else {
         print("user is not found");
         insert();
+        _uploadImage_front();
         await prefs.setString('ID1', id);
       }
 
       await conn.close();
     }
+
   }
 
   void showDatePicker1() {
@@ -144,22 +167,6 @@ class _signupscreenState extends State<signupscreen> {
   }
 
   //String? contents =  imageTemp.readAsString();
-  Future<void> _imageToString() async {
-    try {
-      if (_imageFile != null) {
-        final bytes = await _imageFile!.readAsBytes();
-        Uint8List blob = Uint8List.fromList(bytes);
-
-        setState(() {
-          _imageString = blob;
-        });
-
-        print('Image converted to string: $_imageString');
-      }
-    } catch (e) {
-      print('Error converting image to string: $e');
-    }
-  }
 
   Future<void> _pickImage() async {
     final pickedFile = await ImagePicker().pickImage(
@@ -169,9 +176,6 @@ class _signupscreenState extends State<signupscreen> {
       setState(() {
         _imageFile = File(pickedFile.path);
       });
-
-      // Convert the image file to a string
-      _imageToString();
     }
   }
 
@@ -527,7 +531,7 @@ class _signupscreenState extends State<signupscreen> {
     await conn.connect();
     print("Connected");
     var res = await conn.execute(
-      "INSERT INTO owner (owner_id,owner_name,owner_phonenum,owner_email,owner_pass,owner_bdate,owner_id_picture,owner_tos_agreement) VALUES (:id1, :name1, :phone1, :email1, :pass1, :date1, :image1, :tos1)",
+      "INSERT INTO owner (owner_id,owner_name,owner_phonenum,owner_email,owner_pass,owner_bdate,owner_picture_link,owner_tos_agreement) VALUES (:id1, :name1, :phone1, :email1, :pass1, :date1, :image1, :tos1)",
       {
         "id1": idTextEditingController.text.trim(),
         "name1": nameTextEditingController.text.trim(),
@@ -535,7 +539,7 @@ class _signupscreenState extends State<signupscreen> {
         "email1": emailTextEditingController.text.trim(),
         "pass1": passTextEditingController.text.trim(),
         "date1": dateTextEditingController.text.trim(),
-        "image1": _imageString,
+        "image1": imageLink_front,
         "tos1": isChecked,
       },
     );
