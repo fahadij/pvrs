@@ -34,7 +34,7 @@ class _ContractPageState extends State<ContractPage> {
 
     print("Connected");
 
-    await conn.execute("INSERT INTO terms (owner_terms,renter_terms) VALUES (:vid1, :vn)",
+    await conn.execute("INSERT INTO contract (owner_terms,renter_terms) VALUES (:vid1, :vn)",
         {
         "vid1": ownerTerms,
         "vn": renterTerms
@@ -64,7 +64,7 @@ class _ContractPageState extends State<ContractPage> {
     await conn.connect();
 
     print("Connected");
-    await conn.execute("UPDATE agreements SET owner_agreed = ownerAgreed WHERE id = 1");
+    await conn.execute("UPDATE contract SET owner_agreed = ownerAgreed WHERE id = 1");
   }
 
   Future<void> agreeRenterTerms() async {
@@ -88,7 +88,7 @@ class _ContractPageState extends State<ContractPage> {
 
     print("Connected");
     // Update the database to reflect the agreement
-    await conn.execute("UPDATE agreements SET renter_agreed = $renterAgreed WHERE id = 1");
+    await conn.execute("UPDATE contract SET renter_agreed = $renterAgreed WHERE id = 1");
   }
 
   Future<void> confirmAgreement() async {

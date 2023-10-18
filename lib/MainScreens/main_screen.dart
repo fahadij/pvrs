@@ -80,7 +80,7 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
   void initState(){
     super.initState();
 
-    tabController = TabController(length: 8, vsync: this);
+    tabController = TabController(length: 7, vsync: this);
   }
   @override
   Widget build(BuildContext context) {
@@ -96,7 +96,6 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
          VehicleRenterPage(),
          FAQScreen(),
          Complaints_page(),
-         PaymentPage(),
          SelectPage(),
          profilepage(),
 
@@ -111,12 +110,12 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
           ),
 
           BottomNavigationBarItem(
-            icon: Icon(Icons.car_rental),
+            icon: Icon(Icons.pedal_bike),
             label: "host a car",
           ),
 
           BottomNavigationBarItem(
-            icon: Icon(Icons.car_rental_sharp),
+            icon: Icon(Icons.directions_bike),
             label: "Rent a car",
           ),
 
@@ -129,10 +128,6 @@ class _MainScreenState extends State<MainScreen> with SingleTickerProviderStateM
           BottomNavigationBarItem(
             icon: Icon(Icons.speaker),
             label: "Complaints page",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.credit_card),
-            label: "Payment",
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.card_travel),

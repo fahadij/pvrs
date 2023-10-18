@@ -49,14 +49,10 @@ class _SelectPageState extends State<SelectPage> {
     // create connection
     final conn = await MySQLConnection.createConnection(
       host: "10.0.2.2",
-      //when you use simulator
-      //host: "10.0.2.2",   when you use emulator
-      //host: "localhost"
       port: 3306,
       userName: "root",
       password: "root",
-      // you need to replace with your password
-      databaseName: "pvers", // you need to replace with your db name
+      databaseName: "pvers",
     );
 
     await conn.connect();

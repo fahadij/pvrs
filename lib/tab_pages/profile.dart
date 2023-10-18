@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get_utils/src/get_utils/get_utils.dart';
 import 'package:mysql_client/mysql_client.dart';
+import 'package:pvers_customer/invoic.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../authentication/Contract_wip.dart';
 import '../authentication/domain/image_show.dart';
 import '../authentication/image_show_user.dart';
 import '../authentication/login_screen.dart';
@@ -381,8 +383,52 @@ class _profilepageState extends State<profilepage> {
 
                 ),
               ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                      context, MaterialPageRoute(builder: (c) =>  ContractPage()));
+
+                },
+                style:
+                ElevatedButton.styleFrom(
+                  backgroundColor: Colors.lightGreenAccent,
+                ),
+
+                child: Text
+                  (
+                  "go to Contract page",
+                  style: TextStyle(
+                    color: Colors.black54,
+                    fontSize: 18,
+                  ),
+
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                      context, MaterialPageRoute(builder: (c) =>  InvoicePage()));
+
+                },
+                style:
+                ElevatedButton.styleFrom(
+                  backgroundColor: Colors.lightGreenAccent,
+                ),
+
+                child: Text
+                  (
+                  "go to invoice page",
+                  style: TextStyle(
+                    color: Colors.black54,
+                    fontSize: 18,
+                  ),
+
+                ),
+              ),
+
             ],
           ),
+
         ),
       ),
     );
@@ -481,6 +527,7 @@ class _profilepageState extends State<profilepage> {
 
 
     }
+
   }
 
 
