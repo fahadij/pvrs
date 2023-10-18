@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:googleapis/testing/v1.dart';
 import 'package:mysql_client/mysql_client.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'My_vehicle_page.dart';
@@ -41,25 +43,26 @@ class _SelectPageState extends State<SelectPage> {
   List<Map<String, String>> displayList = [];
 
 
-
   Future<void> _select() async {
     print("Connecting to mysql server...");
 
     // create connection
     final conn = await MySQLConnection.createConnection(
-      host: "10.0.2.2",   //when you use simulator
+      host: "10.0.2.2",
+      //when you use simulator
       //host: "10.0.2.2",   when you use emulator
       //host: "localhost"
       port: 3306,
       userName: "root",
-      password: "root", // you need to replace with your password
+      password: "root",
+      // you need to replace with your password
       databaseName: "pvers", // you need to replace with your db name
     );
 
     await conn.connect();
 
     print("Connected");
-    print (token2);
+    print(token2);
     // make query
     var result = await conn.execute(
         "SELECT V_num,V_Name,V_Model FROM vehicle WHERE owner_id_V = $token2  ORDER BY V_num ASC");
@@ -80,7 +83,7 @@ class _SelectPageState extends State<SelectPage> {
         'vehicleModel': row.colByName("V_Model")!,
       };
       list.add(data);
-      vid =row.colAt(0)!;
+      vid = row.colAt(0)!;
       print(vid);
       //await pref.setString('selectedVID', vid);
     }
@@ -110,7 +113,7 @@ class _SelectPageState extends State<SelectPage> {
           title: Text('My Vehicle page')
       ),
       body: Column(
-          children:[
+          children: [
 
             Expanded(
               flex: 3,
@@ -119,17 +122,20 @@ class _SelectPageState extends State<SelectPage> {
                 Column(children: displayList.map<Widget>((data) {
                   return Card(
                       child: ListTile(
-                        leading: Text(data['VID']?? ""),
-                        title: Text(data['vehicleName']?? ""),
-                        subtitle: Text(data['vehicleModel']?? ""),
+                        leading: Text(data['VID'] ?? ""),
+                        title: Text(data['vehicleName'] ?? ""),
+                        subtitle: Text(data['vehicleModel'] ?? ""),
                         trailing: TextButton(
                           child: const Text("update"),
                           onPressed: () async {
-                            SharedPreferences pref = await SharedPreferences.getInstance();
-                            pref.setString('selectedVIDreft', data['VID'] ?? ""); // Save the selected VID
+                            SharedPreferences pref = await SharedPreferences
+                                .getInstance();
+                            pref.setString('selectedVIDreft',
+                                data['VID'] ?? ""); // Save the selected VID
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => vehicle_page()),
+                              MaterialPageRoute(
+                                  builder: (context) => vehicle_page()),
                             );
                           },
                         ),
@@ -145,4 +151,5 @@ class _SelectPageState extends State<SelectPage> {
           ]),
     );
   }
+
 }

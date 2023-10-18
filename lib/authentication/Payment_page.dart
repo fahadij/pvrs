@@ -31,15 +31,17 @@ class _PaymentPageState extends State<PaymentPage> {
     setState(() {
          
       userId = pref.getString("ID1");
-      print("this is the id that is conected$userId");
       amountController.text = pref.getString("TotalPrice")!;
-      var test = pref.getString("TotalPrice");
-      print("this is the full price for the rent$test");
       //nameTextEditingController.text =
     });
   }
 
-  Future<void> makePayment(double amount, String cardNumber, String expirationDate,String? userId ) async {
+  Future<void> makePayment() async {
+    double amount = double.parse(amountController.text);
+    String cardNumber = cardNumberController.text;
+    String expirationDate = expirationController.text;
+    getCred();
+    DateTime now = DateTime.now();
     print("Connecting to mysql server...");
 
     final conn = await MySQLConnection.createConnection(
@@ -48,10 +50,9 @@ class _PaymentPageState extends State<PaymentPage> {
         userName: 'root',
         password: 'root',
         databaseName: 'pvers');
-    print("Connected");
-    String? expirationDate = expirationController.text;
 
-    DateTime now = DateTime.now();
+    print("Connected");
+
 DateTime now2 = DateTime.now();
     int? day = now2.day;
     List<String> dateParts = expirationDate.split('/');
@@ -75,19 +76,6 @@ DateTime now2 = DateTime.now();
     await conn.close();
   }
 
-  void makePaymentAndNavigate() async {
-    double amount = double.parse(amountController.text);
-    String cardNumber = cardNumberController.text;
-    String expirationDate = expirationController.text;
-    // Assuming user ID is 1 for this example.
-    getCred();
-    DateTime now = DateTime.now();
-
-    await makePayment(amount, cardNumber, expirationDate, userId);
-
-    // Navigate to homepage after payment
-    // Assuming you want to go back to the previous screen
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -115,12 +103,7 @@ DateTime now2 = DateTime.now();
             ),
             SizedBox(height: 20.0),
             ElevatedButton(
-              onPressed:(){ makePaymentAndNavigate;
-                Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => MainScreen()),
-                );
-              },
+              onPressed:(){ makePayment();},
               child: Text('Make Payment'),
             ),
           ],

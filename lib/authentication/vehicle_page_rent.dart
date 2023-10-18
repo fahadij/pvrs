@@ -52,8 +52,8 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
         });
       }
     }
-    final SharedPreferences pref1 = await SharedPreferences.getInstance();
-    await pref1.remove('selectedVIDreft');
+
+
     var token3 = pref.getString("selectedVIDreft")!;
     print(token3);
     await conn.close();

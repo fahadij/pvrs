@@ -322,7 +322,7 @@ class _profilepageState extends State<profilepage> {
               ElevatedButton(
                 onPressed: () {
                   Navigator.push(
-                      context, MaterialPageRoute(builder: (c) =>  ImageUploadPage()));
+                      context, MaterialPageRoute(builder: (c) =>  ImageUploadPageuser()));
                 },
                 style:
                 ElevatedButton.styleFrom(

@@ -6,12 +6,12 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:mysql_client/mysql_client.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class ImageUploadPage extends StatefulWidget {
+class ImageUploadPageuser extends StatefulWidget {
   @override
-  _ImageUploadPageState createState() => _ImageUploadPageState();
+  _ImageUploadPageStateuser createState() => _ImageUploadPageStateuser();
 }
 
-class _ImageUploadPageState extends State<ImageUploadPage> {
+class _ImageUploadPageStateuser extends State<ImageUploadPageuser> {
   File? _image;
   String? _imageLink;
   String? token;
@@ -38,7 +38,7 @@ class _ImageUploadPageState extends State<ImageUploadPage> {
         _image = File(pickedFile.path);
       });
 
-      final storageRef = FirebaseStorage.instance.ref().child('images/$token');
+      final storageRef = FirebaseStorage.instance.ref().child('images/user/$token');
       final imageName = _image!.path.split('/').last;
       final imageRef = storageRef.child(imageName);
 
