@@ -56,17 +56,17 @@ DROP TABLE IF EXISTS `contract`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `contract` (
-  `Con_No` int NOT NULL,
-  `Con_Date_of_issue` varchar(45) DEFAULT NULL,
-  `Con_Beginning_of_Rent_date` varchar(45) DEFAULT NULL,
-  `Con_End_of_Rent_date` varchar(45) DEFAULT NULL,
-  `Conf_Rent_date` varchar(45) DEFAULT NULL,
+  `Con_No` int NOT NULL AUTO_INCREMENT,
+  `Con_Date_of_issue` datetime DEFAULT NULL,
+  `Con_Beginning_of_Rent_date` datetime DEFAULT NULL,
+  `Con_End_of_Rent_date` datetime DEFAULT NULL,
+  `Con_Rent_date` datetime DEFAULT NULL,
   `Con_ToS_agreement` tinyint DEFAULT NULL,
   `Res_num` int DEFAULT NULL,
   PRIMARY KEY (`Con_No`),
   KEY `res_num_idx` (`Res_num`),
   CONSTRAINT `res_num` FOREIGN KEY (`Res_num`) REFERENCES `reservation` (`RESno`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -120,11 +120,11 @@ CREATE TABLE `invoice` (
   `card_number` varchar(45) DEFAULT NULL,
   `expiration_date` date DEFAULT NULL,
   PRIMARY KEY (`invoice_num`),
-  KEY `Con_no_idx` (`conNo`),
   KEY `User_id_idx` (`user_id`),
-  CONSTRAINT `conNo12` FOREIGN KEY (`conNo`) REFERENCES `contract` (`Con_No`),
+  KEY `con_num1_idx` (`conNo`),
+  CONSTRAINT `con_num1` FOREIGN KEY (`conNo`) REFERENCES `contract` (`Con_No`),
   CONSTRAINT `User_id_` FOREIGN KEY (`user_id`) REFERENCES `owner` (`owner_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -133,7 +133,7 @@ CREATE TABLE `invoice` (
 
 LOCK TABLES `invoice` WRITE;
 /*!40000 ALTER TABLE `invoice` DISABLE KEYS */;
-INSERT INTO `invoice` VALUES (3,'2023-10-18 19:36:36',3110,10,1009196587,'154789632541','2025-10-18'),(4,'2023-10-18 22:55:55',2870,NULL,1009196587,'51124120120','2035-10-18'),(5,'2023-10-18 23:11:48',3110,NULL,1009196587,'54779800','2025-10-18');
+INSERT INTO `invoice` VALUES (3,'2023-10-18 19:36:36',3110,10,1009196587,'154789632541','2025-10-18'),(4,'2023-10-18 22:55:55',2870,NULL,1009196587,'51124120120','2035-10-18'),(5,'2023-10-18 23:11:48',3110,NULL,1009196587,'54779800','2025-10-18'),(6,'2023-10-19 17:09:00',2870,NULL,1578898425,'5432123456','2027-10-19');
 /*!40000 ALTER TABLE `invoice` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -272,4 +272,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-10-19  1:11:55
+-- Dump completed on 2023-10-19 17:24:23
