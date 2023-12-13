@@ -41,7 +41,7 @@ class _hometabpageState extends State<hometabpage> {
                 ),
                 child: const Text
                   (
-                  "Rturn to home page",
+                  "Return to home page",
                   style: TextStyle(
                     color: Colors.black54,
                     fontSize: 18,

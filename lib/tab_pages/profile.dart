@@ -4,11 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get_utils/src/get_utils/get_utils.dart';
 import 'package:mysql_client/mysql_client.dart';
+import 'package:pvers_customer/authentication/My_reservations_wip.dart';
 import 'package:pvers_customer/invoic.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../authentication/Contract_wip.dart';
-import '../authentication/domain/image_show.dart';
 import '../authentication/image_show_user.dart';
 import '../authentication/login_screen.dart';
 import 'FAQ.dart';
@@ -29,7 +29,7 @@ class _profilepageState extends State<profilepage> {
   TextEditingController emailTextEditingController = TextEditingController();
   String? token;
   String? token2;
-  String? _imageLink = "https://www.google.com/images/branding/googlelogo/2x/googlelogo_light_color_92x30dp.png";
+  String? _imageLink = "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Square_-_black_simple.svg/2048px-Square_-_black_simple.svg.png";
 
 
   @override
@@ -99,23 +99,23 @@ class _profilepageState extends State<profilepage> {
               Align(
                 alignment: Alignment.centerLeft,
                 child: Padding(
-                padding: const EdgeInsets.all(10),
-                child: ClipOval(
-                child: Image.asset("images/logo-color.png",
-                  width: 100,
-                  height: 100,
+                  padding: const EdgeInsets.all(10),
+                  child: ClipOval(
+                    child: Image.asset("images/logo-color.png",
+                      width: 100,
+                      height: 100,
+                    ),
+                  ),
                 ),
-              ),
-              ),
               ),
               const SizedBox(height: 10),
               Align(
                 alignment: Alignment.center,
                 child: Padding(
                   padding: const EdgeInsets.all(10),
-                  child: ClipOval(
+                  child: SizedBox(
                     child: Image.network(_imageLink!,
-                      width: 100,
+                      width: 200,
                       height: 100,
                     ),
                   ),
@@ -324,7 +324,8 @@ class _profilepageState extends State<profilepage> {
               ElevatedButton(
                 onPressed: () {
                   Navigator.push(
-                      context, MaterialPageRoute(builder: (c) =>  ImageUploadPageuser()));
+                      context,
+                      MaterialPageRoute(builder: (c) => ImageUploadPageuser()));
                 },
                 style:
                 ElevatedButton.styleFrom(
@@ -333,7 +334,7 @@ class _profilepageState extends State<profilepage> {
 
                 child: Text
                   (
-                  "change the image",
+                  "Update ID image",
                   style: TextStyle(
                     color: Colors.black54,
                     fontSize: 18,
@@ -386,8 +387,8 @@ class _profilepageState extends State<profilepage> {
               ElevatedButton(
                 onPressed: () {
                   Navigator.push(
-                      context, MaterialPageRoute(builder: (c) =>  ContractPage()));
-
+                      context,
+                      MaterialPageRoute(builder: (c) => Reservationpage()));
                 },
                 style:
                 ElevatedButton.styleFrom(
@@ -407,8 +408,8 @@ class _profilepageState extends State<profilepage> {
               ElevatedButton(
                 onPressed: () {
                   Navigator.push(
-                      context, MaterialPageRoute(builder: (c) =>  InvoicePage()));
-
+                      context,
+                      MaterialPageRoute(builder: (c) => InvoicePage()));
                 },
                 style:
                 ElevatedButton.styleFrom(
@@ -433,6 +434,7 @@ class _profilepageState extends State<profilepage> {
       ),
     );
   }
+
   Future<void> _retrieveImage() async {
     getCred();
     print("Connecting to mysql server...");
@@ -444,22 +446,36 @@ class _profilepageState extends State<profilepage> {
         databaseName: 'pvers');
     await conn.connect();
     print("Connected");
-    final res = await conn.execute(
-        "SELECT owner_picture_link FROM owner WHERE owner_id = $token2 "
-    );
-    for (final row in res.rows) {
-      _imageLink = row.colByName("owner_picture_link");
+    var check_user_is_owner = await conn.execute(
+        "SELECT * FROM owner WHERE owner_id = '$token'");
+    var check_user_is_renter = await conn.execute(
+        "SELECT * FROM renter WHERE Renter_ID = '$token'");
+     // for owner
+    if (check_user_is_owner.numOfRows == 1) {
+      final res = await conn.execute(
+          "SELECT owner_picture_link FROM owner WHERE owner_id = $token2 "
+      );
+      for (final row in res.rows) {
+        _imageLink = row.colByName("owner_picture_link");
+      }
+      await conn.close();
+    }
+    // for renter
+    else if (check_user_is_renter.numOfRows == 1) {
+      final res = await conn.execute(
+          "SELECT Renter_picture_link FROM renter WHERE Renter_ID = $token2 "
+      );
+      for (final row in res.rows) {
+        _imageLink = row.colByName("Renter_picture_link");
+      }
+      await conn.close();
     }
 
-    //final row = res.affectedRows;
-    //final imageLink = row['image_link'] as String?;
-
-    await conn.close();
-
-
-
-
   }
+
+  //final row = res.affectedRows;
+  //final imageLink = row['image_link'] as String?;
+
 
   Future<void> Logout() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -481,26 +497,49 @@ class _profilepageState extends State<profilepage> {
         databaseName: 'pvers');
 
     await conn.connect();
+
     print("Connected");
-    var res = await conn.execute(
-        "SELECT * FROM owner WHERE owner_id = $token2 "
-    );
-
-    for (final row in res.rows) {
-      final data = {
-        setState(() {
-          nameTextEditingController.text = row.colAt(1)!;
-          phoneTextEditingController.text = row.colAt(2)!;
-          emailTextEditingController.text = row.colAt(4)!;
-          passTextEditingController.text = row.colAt(6)!;
-        }),
-      };
-
-
+    var check_user_is_owner = await conn.execute(
+        "SELECT * FROM owner WHERE owner_id = '$token'");
+    var check_user_is_renter = await conn.execute(
+        "SELECT * FROM renter WHERE Renter_ID = '$token'");
+       // for owner
+    if (check_user_is_owner.numOfRows == 1) {
+      print("user is owner");
+      var res = await conn.execute(
+          "SELECT * FROM owner WHERE owner_id = $token2 "
+      );
+      for (final row in res.rows) {
+        final data = {
+          setState(() {
+            nameTextEditingController.text = row.colAt(1)!;
+            phoneTextEditingController.text = row.colAt(2)!;
+            emailTextEditingController.text = row.colAt(4)!;
+            passTextEditingController.text = row.colAt(6)!;
+          }),
+        };
+      }
+      await conn.close();
+    }
+    // for renter
+    else if (check_user_is_renter.numOfRows == 1) {
+      print("user is renter");
+      final res = await conn.execute(
+          "SELECT * FROM renter WHERE Renter_ID = $token2 "
+      );
+      for (final row in res.rows) {
+        final data = {
+          setState(() {
+            nameTextEditingController.text = row.colAt(1)!;
+            phoneTextEditingController.text = row.colAt(2)!;
+            emailTextEditingController.text = row.colAt(4)!;
+            passTextEditingController.text = row.colAt(6)!;
+          }),
+        };
+      }
       await conn.close();
     }
   }
-
 
     Future<void> update1() async {
       print("Connecting to mysql server...");
@@ -518,16 +557,31 @@ class _profilepageState extends State<profilepage> {
 
       await conn.connect();
       print("Connected");
-      var res = await conn.execute(
-          "UPDATE owner SET owner_name = '$name1' , owner_phonenum = '$phone1' , owner_email = '$email1' , owner_pass = '$pass1' WHERE owner_id = '$token' ");
 
+      var check_user_is_owner = await conn.execute(
+          "SELECT * FROM owner WHERE owner_id = '$token'");
+      var check_user_is_renter = await conn.execute(
+          "SELECT * FROM renter WHERE Renter_ID = '$token'");
+      if (check_user_is_owner.numOfRows == 1) {
+        print("user is owner");
+        var res = await conn.execute(
+            "UPDATE owner SET owner_name = '$name1' , owner_phonenum = '$phone1' , owner_email = '$email1' , owner_pass = '$pass1' WHERE owner_id = '$token' ");
 
-      await conn.close();
-      Fluttertoast.showToast(msg: "the user updated successfully");
+        await conn.close();
+        Fluttertoast.showToast(msg: "the user updated successfully");
+      }
+
+     else if(check_user_is_renter.numOfRows == 1){
+        var res = await conn.execute(
+            "UPDATE renter SET Renter_Name = '$name1' , Renter_Phone_No = '$phone1' , Renter_Email = '$email1' , Renter_pass = '$pass1' WHERE Renter_ID = '$token' ");
+
+        await conn.close();
+        Fluttertoast.showToast(msg: "the user updated successfully");
+
+      }
 
 
     }
-
   }
 
 

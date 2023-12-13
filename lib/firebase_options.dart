@@ -54,6 +54,7 @@ class DefaultFirebaseOptions {
     appId: '1:826405813464:android:f55d02f55def5ab993ebad',
     messagingSenderId: '826405813464',
     projectId: 'pvre-1425a',
+    databaseURL: 'https://pvre-1425a-default-rtdb.firebaseio.com',
     storageBucket: 'pvre-1425a.appspot.com',
   );
 
@@ -62,6 +63,7 @@ class DefaultFirebaseOptions {
     appId: '1:826405813464:ios:17b7d1873c342a2493ebad',
     messagingSenderId: '826405813464',
     projectId: 'pvre-1425a',
+    databaseURL: 'https://pvre-1425a-default-rtdb.firebaseio.com',
     storageBucket: 'pvre-1425a.appspot.com',
     iosBundleId: 'com.example.pversCustomer',
   );

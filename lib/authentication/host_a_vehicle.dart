@@ -1,3 +1,4 @@
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:mysql_client/mysql_client.dart';
@@ -10,6 +11,7 @@ import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 
 import '../global/global.dart';
+import 'image_show_vehicle.dart';
 
 class hostacarpage extends StatefulWidget {
   const hostacarpage({super.key});
@@ -28,13 +30,34 @@ class _hostacarpageState extends State<hostacarpage> {
   TextEditingController vehiclemodelTextEditingController = TextEditingController();
   TextEditingController vehicleEVTextEditingController = TextEditingController();
   TextEditingController vehicleRateTextEditingController = TextEditingController();
+  TextEditingController imageTextEditingController = TextEditingController();
   TextEditingController vehicleLocationTextEditingController = TextEditingController();
   List<String> carTypesList = ["size-big", "size-medium", "size-small"];
   String? selectedCarType;
   bool isChecked = false;
   TextEditingController idTextEditingController = TextEditingController();
   String token= "";
+  File? _imageFile;
+  String? imageLink_front="";
 
+  Future<void> _uploadImage_front() async {
+    String? id5 = idTextEditingController.text;
+    String? id6 = vehiclenumTextEditingController.text;
+
+    final storageRef = FirebaseStorage.instance.ref().child('images/vehicle/$id5/$id6');
+    final imageName = _imageFile!.path.split('/').last;
+    final imageRef = storageRef.child(imageName);
+
+    final uploadTask = imageRef.putFile(_imageFile!);
+    final snapshot = await uploadTask.whenComplete(() => null);
+    final downloadUrl = await snapshot.ref.getDownloadURL();
+
+    setState(() {
+      imageLink_front = downloadUrl;
+    });
+
+    print(imageLink_front);
+  }
 
   @override
   void initState() {
@@ -49,7 +72,7 @@ class _hostacarpageState extends State<hostacarpage> {
       idTextEditingController.text =  token;
 
     });
-  }  @override
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -215,6 +238,74 @@ class _hostacarpageState extends State<hostacarpage> {
 
               ),
 
+              TextField(
+                controller: vehicleRateTextEditingController,
+                keyboardType: TextInputType.number,
+
+                style: const TextStyle(
+                  color: Colors.grey,
+                ),
+                decoration: const InputDecoration(
+                  labelText: "vehicleRate",
+                  hintText: "vehicleRate",
+
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white),
+
+                  ),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white),
+
+                  ),
+                  hintStyle: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 14,
+                  ),
+
+                  labelStyle: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 14,
+                  ),
+
+                ),
+
+
+              ),
+
+              const SizedBox(height: 20,),
+              TextField(
+                controller: imageTextEditingController,
+                onTap: () {
+                  _pickImage();
+                },
+                readOnly: true,
+                style: TextStyle(
+                  color: Colors.grey,
+                ),
+                decoration: InputDecoration(
+                  labelText: "image",
+                  hintText: "image",
+
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white),
+
+                  ),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Colors.white),
+
+                  ),
+                  hintStyle: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 14,
+                  ),
+
+                  labelStyle: TextStyle(
+                    color: Colors.grey,
+                    fontSize: 14,
+                  ),
+
+                ),
+              ),
               const SizedBox(height: 20,),
               DropdownButton(
                 dropdownColor: Colors.white24,
@@ -356,6 +447,17 @@ class _hostacarpageState extends State<hostacarpage> {
     );
   }
 
+  Future<void> _pickImage() async {
+    final pickedFile = await ImagePicker().pickImage(
+        source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      setState(() {
+        _imageFile = File(pickedFile.path);
+      });
+    }
+  }
+
   validateForm() async {
     if (vehiclenumTextEditingController.text.isEmpty) {
       Fluttertoast.showToast(msg: "the vehicle number must not be empty");
@@ -369,11 +471,12 @@ class _hostacarpageState extends State<hostacarpage> {
       Fluttertoast.showToast(msg: "the vehicle model must not be empty.");
     }
 
-    else if(selectedCarType == null) {
+    else if (selectedCarType == null) {
       Fluttertoast.showToast(msg: "the Vehicle type must not be empty.");
-
-
     }
+    //if{ imageLink_front == null}{
+//  Fluttertoast.showToast(msg: "the Vehicle image must not be empty.");
+  //}
     else
 
       {
@@ -401,6 +504,7 @@ class _hostacarpageState extends State<hostacarpage> {
         else {
           print("vehicle is not found");
           insert();
+          _uploadImage_front();
         }
 
         await conn.close();
@@ -423,7 +527,7 @@ class _hostacarpageState extends State<hostacarpage> {
 
     await conn.connect();
     print("Connected");
-    var res = await conn.execute("INSERT INTO vehicle (V_num,V_Name,V_Model,V_EV,V_Type,owner_id_V) VALUES (:vid1, :vn, :vm, :ev, :et, :uid)",
+    var res = await conn.execute("INSERT INTO vehicle (V_num,V_Name,V_Model,V_EV,V_Type,owner_id_V,V_pictures_front,V_Rate) VALUES (:vid1, :vn, :vm, :ev, :et, :uid ,:pvo,:rate)",
       {
         "vid1": vehiclenumTextEditingController.text.trim(),
         "vn": vehiclenameTextEditingController.text.trim(),
@@ -431,6 +535,8 @@ class _hostacarpageState extends State<hostacarpage> {
         "ev": isChecked,
         "et": selectedCarType,
         "uid":idTextEditingController.text,
+        "pvo":imageLink_front,
+        "rate":vehicleRateTextEditingController.text,
       },
     );
     print(res.affectedRows);

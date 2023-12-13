@@ -3,8 +3,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:pvers_customer/MainScreens/main_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:mysql_client/mysql_client.dart';
 import '../authentication/login_screen.dart';
+import '../authentication/otp_mail.dart';
+import '../authentication/otp_phone.dart';
 
 class MySplashScreen extends StatefulWidget
 {
@@ -18,7 +20,6 @@ class MySplashScreen extends StatefulWidget
 
 
 class _MySplashScreenState extends State<MySplashScreen>
-
 {
   var ID;
   @override
@@ -28,7 +29,7 @@ class _MySplashScreenState extends State<MySplashScreen>
     startTimer();
 
   }
-
+  var phonenumber;
   startTimer(){
     Timer(const Duration(seconds: 3),() async
     {
@@ -37,8 +38,81 @@ class _MySplashScreenState extends State<MySplashScreen>
         ID = pref.getString("ID1");
         print('signed in id is: $ID');
       });
+       if(ID == null){
+         Navigator.push(context, MaterialPageRoute(builder: (c)=> LoginScreen()));
+       }
+       else{
+      print("Connecting to mysql server...");
+var emailowner = '';
+var emailrenter = '';
+      final conn = await MySQLConnection.createConnection(
+          host: '10.0.2.2',
+          port: 3306,
+          userName: 'root',
+          password: 'root',
+          databaseName: 'pvers');
 
-      if(await ID != null ){
+      await conn.connect();
+      print("Connected");
+      var res = await conn.execute("SELECT * FROM owner WHERE owner_id = '$ID'");
+      //owner_pass= '$pass1'
+      var res1 = await conn.execute("SELECT * FROM renter WHERE Renter_ID = '$ID' ");
+      var o = res.numOfRows;
+      var R = res1.numOfRows;
+print("owner checked is $o");
+print("renter checked is $R");
+      if(res.numOfRows == 1) {
+        print("user is owner found");
+        var res2 = await conn.execute(
+            "SELECT * FROM owner WHERE owner_id = '$ID'");
+        if (res2.numOfRows == 1) {
+          print("user is owner found and the mail is authonticated");
+
+          Navigator.push(
+              context, MaterialPageRoute(builder: (c) => const MainScreen()));
+        } else {
+          print("user is owner found and the mail is not authonticated");
+          for (final row in res.rows) {
+            final data = {
+              setState(() {
+                phonenumber = row.colByName("owner_phonenum")!;
+                emailowner = row.colByName("owner_email")!;
+              },)
+            };
+          };
+          await conn.close();
+          print("this is the value of phone$phonenumber");
+          Navigator.push(context,
+              MaterialPageRoute(builder: (c) => otp_mail(email: emailowner)));
+        }
+      }
+       if(res1.numOfRows == 1){
+
+        var res4 = await conn.execute("SELECT * FROM renter WHERE Renter_ID = '$ID' AND otp IS NOT NULL");
+        if(res4.numOfRows == 1){
+          print("user is renter found and the phone is authonticated");
+          Navigator.push(context,MaterialPageRoute(builder: (c) => const MainScreen()));
+        } else{
+          print("user is renter found and the phone is not authonticated");
+          for (final row in res4.rows) {
+            final data = {
+              phonenumber = row.colByName("Renter_Phone_No")!,
+              emailrenter = row.colByName("Renter_Email")!,
+
+            };};
+          print("this is the value of email$emailrenter");
+          await conn.close();
+          Navigator.push(context,MaterialPageRoute(builder: (c) =>  otp_mail(email: emailowner)));
+        }
+    }
+
+      if(res1 ==0 && res == 0){
+        print("user is not found");
+        Navigator.push(context, MaterialPageRoute(builder: (c)=> LoginScreen()));
+      }
+
+    }});
+      /*if(await ID != null ){
 
         Navigator.push(context, MaterialPageRoute(builder: (c)=> MainScreen()));
 
@@ -48,10 +122,10 @@ class _MySplashScreenState extends State<MySplashScreen>
 
       }
       //send user to home screen
+*/
 
+    }
 
-    });
-  }
 
 
   @override

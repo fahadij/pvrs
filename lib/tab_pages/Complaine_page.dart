@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:mysql_client/mysql_client.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'Complainets_details.dart';
 
 void main() {
   runApp(MyApp());
@@ -17,11 +20,11 @@ class MyApp extends StatelessWidget {
 
 class Complaints_page extends StatefulWidget {
   @override
-  _FAQScreenState createState() => _FAQScreenState();
+  _Complaints_page createState() => _Complaints_page();
 }
 
-class _FAQScreenState extends State<Complaints_page> {
-  List<Map<String, String>> faqs = [
+class _Complaints_page extends State<Complaints_page> {
+  List<Map<String, String?>> Complaine = [
     {
       'question': 'How to add an Complaint?',
       'answer': 'Click the "+" button and fill out the form.'
@@ -31,193 +34,82 @@ class _FAQScreenState extends State<Complaints_page> {
   TextEditingController questionController = TextEditingController();
   TextEditingController answerController = TextEditingController();
   TextEditingController idController = TextEditingController();
+  String? token;
+  String? test;
+  String? ID_delete;
+  String? ID_update;
+  List<Map<String, String>> displayList = [];
+  List<Map<String, String>> filteredList = [];
+  List<Map<String, String>> tempList1 = [];
+  bool isTextFieldFocused = false;
+  final TextEditingController searchController = TextEditingController();
 
+  void initState() {
+    super.initState();
+    getCred();
+    select1();
+  }
 
-  void _addComplaints(String question, String answer, String ID) {
+  void getCred() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      faqs.add({'ID': ID, 'complaint question': question, 'complaint content': answer});
+      token = pref.getString("ID1")!;
+      test = pref.getString("ID1")!;
+      print(token);
     });
   }
 
-  void _updateComplaints(int index, String question, String answer, String ID) {
+  void _addComplaints(String question, String answer, String id) {
     setState(() {
-      faqs[index] = {'ID': ID, 'complaint question': question, 'complaint answer': answer};
+      Complaine.add({
+        'id': id,
+        'question': question,
+        'answer': answer
+      });
+      insert();
+      select1();
     });
   }
 
-  void _deleteComplaints(int index) {
+  void _updateComplaints(int index, String question, String answer, String id) {
     setState(() {
-      faqs.removeAt(index);
+      Complaine[index] = {'question': question, 'answer': answer};
+      ID_update = Complaine[index]['id']!;
     });
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('complaint Page'),
-      ),
-      body: ListView.builder(
-        itemCount: faqs.length,
-        itemBuilder: (context, index) {
-          return Card(
-            margin: EdgeInsets.all(8.0),
-            child: ListTile(
-              title: Text(faqs[index]['complaint question'] ?? ''),
-              subtitle: Text(faqs[index]['complaint answer'] ?? ''),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    icon: Icon(Icons.edit),
-                    onPressed: () {
-                      idController.text = faqs[index]['id'] ?? '';
-                      questionController.text = faqs[index]['complaint question'] ?? '';
-                      answerController.text = faqs[index]['complaint answer'] ?? '';
-                      update();
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: Text('Cancel complaint'),
-                            content: SingleChildScrollView(
-                                child: Column(
-                                  children: [
-                                    TextField(
-                                      controller: idController,
-                                      decoration: InputDecoration(
-                                          labelText: 'complaint ID'),
-                                    ),
-                                    TextField(
-                                      controller: questionController,
-                                      decoration: InputDecoration(
-                                          labelText: 'complaint Question'),
-                                    ),
-                                    TextField(
-                                      controller: answerController,
-                                      decoration: InputDecoration(
-                                          labelText: 'complaint Answer'),
-                                    ),
 
-                                  ],
-                                )),
-                            actions: [
-                              TextButton(
-                                child: Text('Cancel'),
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                              ),
-                              TextButton(
-                                child: Text('Save'),
-                                onPressed: () {
-                                  _updateComplaints(index, questionController.text,
-                                      answerController.text, idController.text);
-                                  Navigator.of(context).pop();
-                                },
-                              ),
-                            ],
-                          );
-                        },
-                      );
-                    },
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.delete),
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: Text('delete FAQ'),
-                            content: Text(
-                                'Are you sure you want to delete this complaint?'),
-                            actions: [
-                              TextButton(
-                                child: Text('Cancel'),
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                              ),
-                              TextButton(
-                                child: Text('Delete'),
-                                onPressed: () {
-                                  _deleteComplaints(index);
-                                  Navigator.of(context).pop();
-                                  deletfaq();
-                                },
-                              ),
-                            ],
-                          );
-                        },
-                      );
-                    },
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          questionController.text = '';
-          answerController.text = '';
-          idController.text = '';
-
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: Text('Add complaint'),
-                content: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        TextField(
-                          controller: idController,
-                          decoration: InputDecoration(labelText: 'ID'),
-                        ),
-                        TextField(
-                          controller: questionController,
-                          decoration: InputDecoration(labelText: 'Question'),
-                        ),
-                        TextField(
-                          controller: answerController,
-                          decoration: InputDecoration(labelText: 'Answer'),
-                        ),
-
-                      ],
-                    )),
-                actions: [
-                  TextButton(
-                    child: Text('Cancel'),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                  TextButton(
-                    child: Text('Save'),
-                    onPressed: () {
-                      _addComplaints(questionController.text, answerController.text,
-                          idController.text);
-                      Navigator.of(context).pop();
-                      insert();
-                    },
-                  ),
-                ],
-              );
-            },
-          );
-        },
-        child: Icon(Icons.add),
-      ),
-    );
+  void _filterList(String query) {
+    List<Map<String, String>> tempList = [];
+    if (query.isNotEmpty) {
+      displayList.forEach((data) {
+        if (data['id'].toString().contains(query) || data['question'].toString().contains(query)) {
+          tempList.add(data);
+        }
+      });
+    } else {
+      tempList.addAll(tempList1);
+    }
+    setState(() {
+      filteredList = tempList;
+      displayList = filteredList;
+    });
+    setState(() {});
+    print("this is the inside of the list$filteredList");
   }
 
+  void _search() {
+    setState(() {
+      filteredList = tempList1;
+      displayList = filteredList;
+    });
+    print("this is mylist: $filteredList");
+    String query = searchController.text;
+    print("this is a test to see the value of: $query");
+    _filterList(query);
+  }
 
-  Future<void> update() async {
-    String select = questionController.text;
-    String? test;
+  Future<void> update1() async {
     print("Connecting to MySQL server...");
 
     final conn = await MySQLConnection.createConnection(
@@ -229,54 +121,12 @@ class _FAQScreenState extends State<Complaints_page> {
     );
 
     await conn.connect();
-    print("this is a test help $select");
-    var result = await conn.execute(
-        "SELECT * FROM complaints WHERE complaint_sub = '$select' "); //idk why it errors out
-    print(result.affectedRows);
-    for (final row in result.rows) {
-      final data = {
-        setState((){
-          test: row.colAt(1)!;
-        }),
-      };
 
-
-      print("this is a test $test");
-
-      var res = await conn.execute(
-        "UPDATE complaints (complaint_sub,complaint_description) VALUES (:vid1, :vn1)",
-        {
-          "vid1": questionController.text.trim(),
-          "vn1": answerController.text.trim(),
-          "num1": idController.text.trim()
-        },
-      );
-      print(res.affectedRows);
-
-      await conn.close();
-      Fluttertoast.showToast(msg: "the FAQ registered successfully");
-    }
-  }
-
-  Future<void> insert() async {
-    print("Connecting to mysql server...");
-
-
-    final conn = await MySQLConnection.createConnection(
-        host: '10.0.2.2',
-        port: 3306,
-        userName: 'root',
-        password: 'root',
-        databaseName: 'pvers');
-
-    await conn.connect();
-    print("Connected");
     var res = await conn.execute(
-      "INSERT INTO faq (FAQ_Headline,FAQ_Content,FAQ_num) VALUES (:vid1, :vn1, :num1)",
+      "UPDATE complaints SET (complaint_sub,complaint_description) VALUES (:vid1, :vn1) WHERE complaint_no ='$test'",
       {
         "vid1": questionController.text.trim(),
         "vn1": answerController.text.trim(),
-        "num1": idController.text.trim()
       },
     );
     print(res.affectedRows);
@@ -285,24 +135,267 @@ class _FAQScreenState extends State<Complaints_page> {
     Fluttertoast.showToast(msg: "the FAQ registered successfully");
   }
 
-  Future<void> deletfaq() async {
+  Future<void> select1() async {
     print("Connecting to mysql server...");
-    var test = idController.text.trim();
-
 
     final conn = await MySQLConnection.createConnection(
-        host: '10.0.2.2',
-        port: 3306,
-        userName: 'root',
-        password: 'root',
-        databaseName: 'pvers');
+      host: '10.0.2.2',
+      port: 3306,
+      userName: 'root',
+      password: 'root',
+      databaseName: 'pvers',
+    );
+    DateTime time = DateTime.now();
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
 
     await conn.connect();
     print("Connected");
-    var res = await conn.execute("DELETE FROM faq WHERE FAQ_num = $test");
+
+    var check_user_is_owner = await conn.execute("SELECT * FROM owner WHERE owner_id = '$token'");
+    var check_user_is_renter = await conn.execute("SELECT * FROM renter WHERE Renter_ID = '$token'");
+    print(check_user_is_owner.numOfRows);
+    if (check_user_is_owner.numOfRows == 1) {
+      print("user is owner");
+
+      var res = await conn.execute("SELECT * FROM complaints WHERE owner_id = $token");
+
+      List<Map<String, String>> list = [];
+      for (final row in res.rows) {
+        final data = {
+          'id': row.colByName("complaint_no")!,
+          'question': row.colByName("complaint_sub")!,
+          'answer': row.colByName("complaint_description")!,
+        };
+        list.add(data);
+        setState(() {
+          displayList = list;
+          tempList1 = list;
+          print(displayList);
+          print(tempList1);
+        });
+      }
+      await conn.close();
+    } else if (check_user_is_renter.numOfRows == 1) {
+      print("user is renter");
+      var results = await conn.execute("SELECT * FROM complaints WHERE Renter_ID = $token");
+      List<Map<String, String>> list = [];
+      for (final row in results.rows) {
+        final data = {
+          'id': row.colByName("complaint_no")!,
+          'question': row.colByName("complaint_sub")!,
+          'answer': row.colByName("complaint_description")!,
+        };
+        list.add(data);
+
+        setState(() {
+          displayList = list;
+          tempList1 = list;
+          print(displayList);
+          print(tempList1);
+        });
+      }
+      await conn.close();
+    }
+  }
+
+  Future<void> insert() async {
+    print("Connecting to mysql server...");
+
+    final conn = await MySQLConnection.createConnection(
+      host: '10.0.2.2',
+      port: 3306,
+      userName: 'root',
+      password: 'root',
+      databaseName: 'pvers',
+    );
+    DateTime time = DateTime.now();
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    await conn.connect();
+    print("Connected");
+
+    var check_user_is_owner = await conn.execute("SELECT owner_id FROM owner WHERE owner_id = '$token'");
+    print("checked owner_ids");
+    var check_user_is_renter = await conn.execute("SELECT * FROM renter WHERE renter_id = '$token'");
+    print("checked renter_ids");
+    if (check_user_is_owner.numOfRows == 1) {
+      print("user is owner");
+
+      var res = await conn.execute(
+        "INSERT INTO complaints (complaint_sub,complaint_description,complaint_date,owner_id) VALUES (:CS, :CD,:DATE,:ID)",
+        {
+          "CD": questionController.text.trim(),
+          "CS": answerController.text.trim(),
+          "DATE": time,
+          "ID": token,
+        },
+      );
+      print(res.affectedRows);
+
+      await conn.close();
+      Fluttertoast.showToast(msg: "the Complaint registered successfully");
+      select1();
+    } else if (check_user_is_renter.numOfRows == 1) {
+      print("user is renter");
+
+      var res2 = await conn.execute(
+        "INSERT INTO complaints (complaint_sub,complaint_description,complaint_date,Renter_id) VALUES (:CS, :CD,:DATE,:ID)",
+        {
+          "CD": questionController.text.trim(),
+          "CS": answerController.text.trim(),
+          "DATE": time,
+          "ID": token,
+        },
+      );
+      print(res2.affectedRows);
+      Fluttertoast.showToast(msg: "the Complaint registered successfully");
+      await conn.close();
+      select1();
+    }
+  }
+
+  Future<void> deletfaq() async {
+    String select = questionController.text;
+    print("Connecting to mysql server...");
+
+    final conn = await MySQLConnection.createConnection(
+      host: '10.0.2.2',
+      port: 3306,
+      userName: 'root',
+      password: 'root',
+      databaseName: 'pvers',
+    );
+    DateTime time = DateTime.now();
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    await conn.connect();
+    print("Connected");
+
+    var res = await conn.execute("DELETE FROM complaints WHERE complaint_no = $ID_delete");
     print(res.affectedRows);
 
     await conn.close();
-    Fluttertoast.showToast(msg: "the FAQ deleted successfully");
+    Fluttertoast.showToast(msg: "the Complaints deleted successfully");
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Complaint Page'),
+        automaticallyImplyLeading: false,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.add),
+            onPressed: () {
+              questionController.text = '';
+              answerController.text = '';
+              idController.text = '';
+
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: Text('Add Complaint'),
+                    content: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          TextField(
+                            controller: idController,
+                            decoration: InputDecoration(labelText: 'ID'),
+                            readOnly: true,
+                          ),
+                          TextField(
+                            controller: questionController,
+                            decoration: InputDecoration(labelText: 'subject'),
+                          ),
+                          TextField(
+                            controller: answerController,
+                            decoration: InputDecoration(labelText: 'Text'),
+                          ),
+                        ],
+                      ),
+                    ),
+                    actions: [
+                      TextButton(
+                        child: Text('Cancel'),
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                      TextButton(
+                        child: Text('Save'),
+                        onPressed: () {
+                          _addComplaints(questionController.text, answerController.text, idController.text);
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    ],
+                  );
+                },
+              );
+            },
+          ),
+        ],
+      ),
+      body: Column(
+        children: [
+          GestureDetector(
+            onTap: () {},
+            child: TextField(
+              controller: searchController,
+              decoration: InputDecoration(
+                labelText: 'Search by Car Number, Model, Type, or Electric',
+                border: OutlineInputBorder(),
+                prefixIcon: Icon(Icons.search),
+              ),
+              onChanged: _filterList,
+              onTap: () {
+                setState(() {
+                  isTextFieldFocused = true;
+                });
+              },
+              onEditingComplete: () {
+                setState(() {
+                  isTextFieldFocused = false;
+                });
+              },
+            ),
+          ),
+          Expanded(
+            flex: 3,
+            child: SingleChildScrollView(
+              child: Column(
+                children: displayList.map<Widget>((data) {
+                  return Card(
+                    child: ListTile(
+                      leading: Text(data['id'] ?? ""),
+                      title: Text(data['question'] ?? ""),
+                      subtitle: Text(data['answer'] ?? ""),
+                      onTap: () {
+                        var ID = int.tryParse(data['id'] ?? '');
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => ComplainetsDetailsPage(complaintId:ID)),
+                        );
+                      },
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+          ),
+        ],
+      ),
+      floatingActionButton: Visibility(
+        visible: isTextFieldFocused,
+        child: FloatingActionButton.extended(
+          onPressed: _search,
+          tooltip: 'Search',
+          label: const Text("Search"),
+          icon: const Icon(Icons.search),
+        ),
+      ),
+    );
   }
 }

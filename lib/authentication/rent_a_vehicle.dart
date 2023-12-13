@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:mysql_client/mysql_client.dart';
+import 'package:printing/printing.dart';
 import 'package:pvers_customer/authentication/vehicle_page_rent.dart';
 import 'package:pvers_customer/tab_pages/home_tab.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'My_vehicle_page.dart';
-import 'domain/format.dart';
+
+
 
 class VehicleRenterPage extends StatefulWidget {
 
@@ -61,9 +62,10 @@ class _SelectPageState extends State<VehicleRenterPage> {
 
     print("Connected");
     print (token2);
+    var available = 0;
     // make query
     var result = await conn.execute(
-        "SELECT * FROM vehicle ORDER BY V_num ASC");
+        "SELECT * FROM vehicle Where V_Status=$available ORDER BY V_num ASC ");
 
     // print some result data
     //print(result.numOfColumns);
@@ -147,8 +149,11 @@ class _SelectPageState extends State<VehicleRenterPage> {
     _filterList(query);
   }
 
+
+
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(
           automaticallyImplyLeading: false,
@@ -209,10 +214,10 @@ class _SelectPageState extends State<VehicleRenterPage> {
     floatingActionButton: Visibility(
         visible: isTextFieldFocused,
         child: FloatingActionButton.extended(
-    onPressed: _search,
-    tooltip: 'Search',
-    label: const Text("Search"),
-    icon: const Icon(Icons.search),
+        onPressed: _search,
+        tooltip: 'Search',
+        label: const Text("Search"),
+        icon: const Icon(Icons.search),
     )
     )
     );

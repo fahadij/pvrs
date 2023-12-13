@@ -1,4 +1,7 @@
 String mapKey = "test";
+String debug_token_app_check_firebase = "950c406b-5c19-47ba-bd1a-43565b5fd54e";
+String SHA256 = "6f:7b:9a:be:b4:2e:f0:de:96:7e:68:2c:d1:6a:4a:7d:f4:2a:39:bd:d0:b8:18:85:b4:fe:9f:21:c6:24:0c:d0";
+String SHA1 = "db:f7:83:d0:ee:74:3b:2b:a8:97:db:a4:19:30:fb:10:33:3c:69:01";
 
 /*
 GoogleMap(

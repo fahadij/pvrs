@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:mysql1/mysql1.dart';
 import 'package:mysql_client/mysql_client.dart';
+import 'package:pvers_customer/tab_pages/home_tab.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../MainScreens/main_screen.dart';
@@ -20,11 +22,31 @@ class _PaymentPageState extends State<PaymentPage> {
   TextEditingController amountController = TextEditingController();
   TextEditingController cardNumberController = TextEditingController();
   TextEditingController expirationController = TextEditingController();
+  TextEditingController CCVController = TextEditingController();
   String? token21;
   String? userId;
+  String? reservationDateStringstart;
+  String? reservationDateStringend;
+  String active = "active";
+  String pending = "pending";
+
 
  void  initState(){
    getCred();
+  }
+
+  validateForm() async {
+
+    /*if (cardNumberController.text.length < 16) {
+      Fluttertoast.showToast(msg: "card number must be 16 digit.");
+    }
+    else */ if (CCVController.text.length < 3) {
+      Fluttertoast.showToast(msg: "CCV must be 3 numbers.");
+    }
+    else {
+    makePayment();
+    }
+
   }
   getCred() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
@@ -32,7 +54,15 @@ class _PaymentPageState extends State<PaymentPage> {
          
       userId = pref.getString("ID1");
       amountController.text = pref.getString("TotalPrice")!;
-      //nameTextEditingController.text =
+        token21 = pref.getString("selectedVIDreft")!;
+      reservationDateStringstart = pref.getString("reservationDateTimestartString") ;
+      reservationDateStringend = pref.getString("reservationDateStringen");
+
+        print("this is the value of token2:$token21");
+        print("this is the value of reservation date$reservationDateStringstart");
+        print("this is the value of reservation date$reservationDateStringend");
+
+
     });
   }
 
@@ -63,19 +93,67 @@ DateTime now2 = DateTime.now();
     DateTime formattedDate = DateTime.now();
     await conn.connect();
     var res = await conn.execute(
-        "INSERT INTO invoice (invoice_total_price, card_number, expiration_date, user_id, invoice_date) VALUES (:vid1, :vn, :vm, :ev, :et)",
+        "INSERT INTO invoice (invoice_total_price, card_number, expiration_date, user_id, invoice_date,invoice_VNUM) VALUES (:vid1, :vn, :vm, :ev, :et, :Vnum)",
         {
           "vid1": amount,
           "vn": cardNumber,
           "vm": date,
           "ev": userId,
           "et": formattedDate,
-        }
-    );
-    print(res.affectedRows);
+          "Vnum":token21,
+        });
     await conn.close();
-  }
+    _createReservation();
 
+    print(res.affectedRows);
+
+    Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => MainScreen()));
+  }
+  Future<void> _createReservation() async {
+    print("Connecting to mysql server... _createReservation");
+    final connection = await MySQLConnection.createConnection(
+      host: '10.0.2.2',
+      port: 3306,
+      userName: 'root',
+      password: 'root',
+      databaseName: 'pvers',
+    );
+    print("Connected _createReservation");
+
+
+
+    // Execute the query
+    final reservationDateTime = DateTime.parse(reservationDateStringstart!);
+    final now = DateTime.now();
+    await connection.connect();
+    if (now.isBefore(reservationDateTime!)) {
+      var res = await connection.execute(
+          "INSERT INTO reservation (V_num_RES, V_Renter_Id, RES_DateTime_start, RES_DateTime_end,RES_Status) VALUES (:vid1, :vn, :vm, :ev, :et)",
+          {
+            "vid1": token21,
+            "vn": userId,
+            "vm": reservationDateStringstart,
+            "ev": reservationDateStringend,
+            "et": pending,
+          });
+      print(res.affectedRows);
+
+    } else if (now.isAfter(reservationDateTime!)) {
+      var res = await connection.execute(
+          "INSERT INTO reservation (V_num_RES, V_Renter_Id, RES_DateTime_start, RES_DateTime_end,RES_Status) VALUES (:vid1, :vn, :vm, :ev, :et)",
+          {
+            "vid1": token21,
+            "vn": userId,
+            "vm": reservationDateStringstart,
+            "ev": reservationDateStringend,
+            "et": active,
+          });
+      print(res.affectedRows);
+    }
+    connection.close();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -97,13 +175,19 @@ DateTime now2 = DateTime.now();
               decoration: InputDecoration(labelText: 'Card Number'),
             ),
             TextField(
+              controller: CCVController,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(labelText: 'CCV Number'),
+            ),
+            TextField(
               controller: expirationController,
               keyboardType: TextInputType.text,
               decoration: InputDecoration(labelText: 'Expiration Date (MM/YY)'),
             ),
             SizedBox(height: 20.0),
             ElevatedButton(
-              onPressed:(){ makePayment();},
+              onPressed:(){ validateForm();
+                },
               child: Text('Make Payment'),
             ),
           ],

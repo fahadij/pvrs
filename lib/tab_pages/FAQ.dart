@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:mysql_client/mysql_client.dart';
@@ -43,30 +45,79 @@ class _FAQScreenState extends State<FAQScreen> {
   TextEditingController questionController = TextEditingController();
   TextEditingController answerController = TextEditingController();
   TextEditingController idController = TextEditingController();
+  String? ID_delete;
+  String? ID_update;
 
 
-  void _addFAQ(String question, String answer, String ID) {
+  void _addFAQ(String question, String answer, String id) {
     setState(() {
-      faqs.add({'ID': ID, 'question': question, 'answer': answer});
+      faqs.add({'id': id ,'question': question, 'answer': answer});
     });
   }
 
-  void _updateFAQ(int index, String question, String answer, String ID) {
+  void _updateFAQ(int index, String question, String answer,String id) {
     setState(() {
-      faqs[index] = {'ID': ID, 'question': question, 'answer': answer};
+      faqs[index] = {'id': id ,'question': question, 'answer': answer};
+      ID_update= faqs[index]['id'];
     });
   }
 
   void _deleteFAQ(int index) {
     setState(() {
+      ID_delete =faqs[index]['id'];
       faqs.removeAt(index);
     });
   }
+
+
+
+  Future<void> fetchFAQsFromDatabase() async {
+    // Establish a connection with your database.
+    final conn = await MySQLConnection.createConnection(
+      host: "10.0.2.2",
+      port: 3306,
+      userName: "root",
+      password: "root",
+      databaseName: "pvers",
+    );
+
+    await conn.connect();
+    var results = await conn.execute("SELECT * FROM faq");
+
+    List<Map<String, String>> list = [];
+
+    for (final row in results.rows) {
+      final data = {
+        'id': row.colByName("faq_num") as String,
+        'question': row.colByName("faq_headline") as String,
+        'answer': row.colByName("faq_content") as String,
+      };
+      list.add(data);
+       setState(() {
+       faqs = list;
+       });
+
+
+    }
+    print("fetch completed");
+    await conn.close();
+
+  }
+
+ @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    fetchFAQsFromDatabase();
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: Text('FAQ Page'),
       ),
       body: ListView.builder(
@@ -86,7 +137,6 @@ class _FAQScreenState extends State<FAQScreen> {
                       idController.text = faqs[index]['id'] ?? '';
                       questionController.text = faqs[index]['question'] ?? '';
                       answerController.text = faqs[index]['answer'] ?? '';
-                      update();
                       showDialog(
                         context: context,
                         builder: (BuildContext context) {
@@ -97,8 +147,8 @@ class _FAQScreenState extends State<FAQScreen> {
                                   children: [
                                     TextField(
                                       controller: idController,
-                                      decoration: InputDecoration(
-                                          labelText: 'ID'),
+                                      decoration: InputDecoration(labelText: 'ID'),
+                                      readOnly: true,
                                     ),
                                     TextField(
                                       controller: questionController,
@@ -124,8 +174,9 @@ class _FAQScreenState extends State<FAQScreen> {
                                 child: Text('Save'),
                                 onPressed: () {
                                   _updateFAQ(index, questionController.text,
-                                      answerController.text, idController.text);
+                                      answerController.text,idController.text);
                                   Navigator.of(context).pop();
+                                  update();
                                 },
                               ),
                             ],
@@ -188,6 +239,7 @@ class _FAQScreenState extends State<FAQScreen> {
                         TextField(
                           controller: idController,
                           decoration: InputDecoration(labelText: 'ID'),
+                          readOnly: true,
                         ),
                         TextField(
                           controller: questionController,
@@ -210,8 +262,7 @@ class _FAQScreenState extends State<FAQScreen> {
                   TextButton(
                     child: Text('Save'),
                     onPressed: () {
-                      _addFAQ(questionController.text, answerController.text,
-                          idController.text);
+                      _addFAQ(questionController.text, answerController.text,idController.text);
                       Navigator.of(context).pop();
                       insert();
                     },
@@ -228,9 +279,12 @@ class _FAQScreenState extends State<FAQScreen> {
 
 
   Future<void> update() async {
-    String select = questionController.text;
-    String? test;
+    var question_db = questionController.text;
+    var answer_db = answerController.text;
     print("Connecting to MySQL server...");
+    print(question_db);
+    print(answer_db);
+
 
     final conn = await MySQLConnection.createConnection(
       host: '10.0.2.2',
@@ -240,35 +294,19 @@ class _FAQScreenState extends State<FAQScreen> {
       databaseName: 'pvers',
     );
 
+
     await conn.connect();
-    print("this is a test help $select");
-    var result = await conn.execute(
-        "SELECT * FROM faq WHERE FAQ_Headline = '$select' "); //idk why it errors out
-    print(result.affectedRows);
-    for (final row in result.rows) {
-      final data = {
-      setState((){
-        test: row.colAt(1)!;
-      }),
-      };
+    print("Connected");
 
-
-      print("this is a test $test");
-
-      var res = await conn.execute(
-        "UPDATE faq (FAQ_Headline,FAQ_Content,FAQ_num) VALUES (:vid1, :vn1, :num1) FAQ_num = $test",
-        {
-          "vid1": questionController.text.trim(),
-          "vn1": answerController.text.trim(),
-          "num1": idController.text.trim()
-        },
-      );
+      var res = await conn.execute("UPDATE faq SET faq_Headline= '$question_db', faq_Content= '$answer_db' WHERE faq_num = $ID_update");
       print(res.affectedRows);
-
+       ID_update ="";
+    print("this is the value of the id after the update$ID_update");
       await conn.close();
-      Fluttertoast.showToast(msg: "the FAQ registered successfully");
+    fetchFAQsFromDatabase();
+    Fluttertoast.showToast(msg: "the FAQ updated successfully");
     }
-  }
+
 
     Future<void> insert() async {
       print("Connecting to mysql server...");
@@ -284,22 +322,23 @@ class _FAQScreenState extends State<FAQScreen> {
       await conn.connect();
       print("Connected");
       var res = await conn.execute(
-        "INSERT INTO faq (FAQ_Headline,FAQ_Content,FAQ_num) VALUES (:vid1, :vn1, :num1)",
+        "INSERT INTO faq (faq_headline,faq_content) VALUES (:vid1, :vn1)",
         {
           "vid1": questionController.text.trim(),
           "vn1": answerController.text.trim(),
-          "num1": idController.text.trim()
         },
       );
       print(res.affectedRows);
 
       await conn.close();
+      fetchFAQsFromDatabase();
       Fluttertoast.showToast(msg: "the FAQ registered successfully");
     }
 
     Future<void> deletfaq() async {
       print("Connecting to mysql server...");
-      var test = idController.text.trim();
+      String? test;
+      String select = questionController.text;
 
 
       final conn = await MySQLConnection.createConnection(
@@ -311,10 +350,12 @@ class _FAQScreenState extends State<FAQScreen> {
 
       await conn.connect();
       print("Connected");
-      var res = await conn.execute("DELETE FROM faq WHERE FAQ_num = $test");
+
+      var res = await conn.execute("DELETE FROM faq WHERE FAQ_num = $ID_delete");
       print(res.affectedRows);
 
       await conn.close();
       Fluttertoast.showToast(msg: "the FAQ deleted successfully");
+      fetchFAQsFromDatabase();
     }
   }

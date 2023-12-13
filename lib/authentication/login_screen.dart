@@ -11,6 +11,7 @@ import 'package:pvers_customer/tab_pages/home_tab.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../widgets/progress_dialog.dart';
+import 'otp_mail.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -137,10 +138,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     fontSize: 18,
                   ),
 
-                  
+
                 ),
               ),
-              
+
               TextButton(
                 child: const Text(
                   "Do not have an account? Register Here",
@@ -164,8 +165,11 @@ class _LoginScreenState extends State<LoginScreen> {
     var id1 = idTextEditingController.text;
     var pass1 = passTextEditingController.text;
     var owner_pass = '';
+    var email_owner = '';
+    var email_renter = '';
     print("Connecting to mysql server...");
 
+    //passkG1N04&QuQHuWwix
     final conn = await MySQLConnection.createConnection(
         host: '10.0.2.2',
         port: 3306,
@@ -173,19 +177,41 @@ class _LoginScreenState extends State<LoginScreen> {
         password: 'root',
         databaseName: 'pvers');
 
+
     await conn.connect();
     print("Connected");
     var res = await conn.execute("SELECT * FROM owner WHERE owner_id = '$id1' AND owner_pass ='$pass1'");
     //owner_pass= '$pass1'
-
+    var res1 = await conn.execute("SELECT * FROM renter WHERE Renter_ID = '$id1' AND Renter_pass ='$pass1'");
 
 
     if(res.numOfRows ==1){
       print("user is found");
 
+      for (final row in res1.rows) {
+        final data = {
+          setState(() {
+            email_owner = row.colAt(4)!;
+          }
+          ),};
+      }
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString('ID1', id1);
-      Navigator.push(context,MaterialPageRoute(builder: (c) => const MainScreen()));
+      Navigator.push(context,MaterialPageRoute(builder: (c) =>  otp_mail(email: email_owner )));
+    }
+    else if(res1.numOfRows ==1) {
+      print("user is found");
+      for (final row in res1.rows) {
+        final data = {
+          setState(() {
+            email_renter = row.colAt(4)!;
+          }
+          ),};
+      }
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString('ID1', id1);
+      Navigator.push(
+          context, MaterialPageRoute(builder: (c) => otp_mail(email: email_renter)));
     }
     else{
       print("user is not found");
@@ -193,6 +219,5 @@ class _LoginScreenState extends State<LoginScreen> {
 
     await conn.close();
   }
+  }
 
-
-}

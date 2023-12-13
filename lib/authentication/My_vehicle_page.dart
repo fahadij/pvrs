@@ -128,6 +128,7 @@ class _vehicle_page extends State<vehicle_page> {
               TextField(
                 controller: vehiclenumTextEditingController,
                 keyboardType: TextInputType.phone,
+                readOnly: true,
 
                 style: const TextStyle(
                   color: Colors.grey,
@@ -509,9 +510,7 @@ class _vehicle_page extends State<vehicle_page> {
     String? V_Model1 = vehiclemodelTextEditingController.text;
     String? V_Type1 = selectedCarType;
     var res = await conn.execute(
-        "UPDATE vehicle SET V_num = '$V_num1' ,V_Name = '$V_name1' ,V_Model = '$V_Model1' ,V_EV='${isChecked
-            ? 1
-            : 0}' ,V_Type ='$V_Type1' WHERE owner_id_V = '$token'");
+        "UPDATE vehicle SET V_Name = '$V_name1' ,V_Model = '$V_Model1' ,V_EV='${isChecked ? 1 : 0}' ,V_Type ='$V_Type1' WHERE V_num = '$V_num1'");
 
     print(res.affectedRows);
 
