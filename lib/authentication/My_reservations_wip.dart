@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:mysql1/mysql1.dart';
@@ -6,6 +8,7 @@ import 'package:printing/printing.dart';
 import 'package:pvers_customer/authentication/Select_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pdf/pdf.dart';
+import 'package:http/http.dart' as http;
 import 'package:pdf/widgets.dart' as pw;
 
 
@@ -56,10 +59,81 @@ class _ReservationpageState extends State<Reservationpage> {
 
     await conn.close();
   }
+  Future<void> updateReservationStatuses() async {
+    String? token2;
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    token2 = pref.getString("ID1")!;
+
+    // Establish database connection
+    final conn = await MySQLConnection.createConnection(
+      host: "10.0.2.2",
+      port: 3306,
+      userName: "root",
+      password: "root",
+      databaseName: "pvers",
+    );
+
+    await conn.connect();
+
+    // Fetch all reservations for the current user
+    final results = await conn.execute(
+      "SELECT * FROM reservation WHERE V_Renter_Id = $token2 ORDER BY RESno ASC",
+    );
+
+    // Loop through each reservation
+    for (final row in results.rows) {
+      final reservationId = row.colByName("RESno");
+      final currentStatus = row.colByName("RES_Status");
+      final startTime = DateTime.parse(row.colByName("RES_DateTime_start")!);
+      final endTime = DateTime.parse(row.colByName("RES_DateTime_end")!);
+
+      // Skip expired or canceled reservations
+      if (currentStatus == "expired" || currentStatus == "canceled") {
+        print("Skipping reservation $reservationId - already expired or canceled.");
+        continue;
+      }
+
+      // Update pending reservation to active
+      if (currentStatus == "pending" && DateTime.now().isAfter(startTime)) {
+        await _updateStatus(conn, reservationId!, "active");
+        print("Reservation $reservationId activated successfully.");
+      }
+
+      // Update active reservation to expired
+      if (currentStatus == "active" && DateTime.now().isAfter(endTime)) {
+        await _updateStatus(conn, reservationId!, "expired");
+        print("Reservation $reservationId expired successfully.");
+      }
+    }
+
+    // Close the database connection
+    await conn.close();
+  }
+
+  Future<void> _updateStatus(conn, String reservationId, String newStatus) async {
+    // Parse the reservationId to an int
+    final int reservationIdInt = int.parse(reservationId);
+
+    // Prepare update query
+
+
+    // Bind parameters
+
+
+    // Execute the update
+    try {
+      await conn.execute("UPDATE reservation SET RES_Status = '$newStatus' WHERE RESno = '$reservationIdInt'");
+    } catch (e) {
+      print("Error updating reservation status: ${e.toString()}");
+    }
+  }
+
+
 
   @override
   void initState() {
     super.initState();
+    updateReservationStatuses();
     fetchReservations();
   }
 
