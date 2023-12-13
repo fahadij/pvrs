@@ -101,6 +101,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
         );
       });
     }
+    createtime();
   }
 
   Future<void> _selectDateend(BuildContext context) async {

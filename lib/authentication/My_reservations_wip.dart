@@ -104,6 +104,10 @@ class _ReservationpageState extends State<Reservationpage> {
         await _updateStatus(conn, reservationId!, "expired");
         print("Reservation $reservationId expired successfully.");
       }
+
+      if (currentStatus == "pending" && DateTime.now().isBefore(startTime)) {
+        print("Reservation $reservationId is still pending but checked successfully.");
+      }
     }
 
     // Close the database connection
@@ -141,7 +145,7 @@ class _ReservationpageState extends State<Reservationpage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Resrvation'),
+        title: Text('Reservations'),
       ),
       body: ListView.builder(
         itemCount: invoices.length,
@@ -160,7 +164,7 @@ class _ReservationpageState extends State<Reservationpage> {
               margin: EdgeInsets.all(8),
               child: ListTile(
                 title: Text(
-                    'Resrvation Number: ${invoices[index]['reservation_num']}'),
+                    'Reservation Number: ${invoices[index]['reservation_num']}'),
                 subtitle: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -287,7 +291,7 @@ class InvoiceDetailPage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ListTile(
-            title: Text('reservation Number: ${invoice['reservation_num']}'),
+            title: Text('Reservation Number: ${invoice['reservation_num']}'),
           ),
           ListTile(
             title: Text('Start Date: ${invoice['RES_DateTime_start1']}'),
@@ -317,7 +321,7 @@ class InvoiceDetailPage extends StatelessWidget {
             ),
             child: const Text
               (
-              "print invoice",
+              "Print Reservation",
               style: TextStyle(
                 color: Colors.black54,
                 fontSize: 18,
@@ -360,7 +364,7 @@ class InvoiceDetailPage extends StatelessWidget {
             ),
             child: const Text
               (
-              "cancele reservation",
+              "cancel Reservation",
               style: TextStyle(
                 color: Colors.black54,
                 fontSize: 18,
