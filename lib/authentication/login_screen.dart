@@ -167,6 +167,7 @@ class _LoginScreenState extends State<LoginScreen> {
     var owner_pass = '';
     var email_owner = '';
     var email_renter = '';
+    var admin_email = '';
     print("Connecting to mysql server...");
 
     //passkG1N04&QuQHuWwix
@@ -183,6 +184,7 @@ class _LoginScreenState extends State<LoginScreen> {
     var res = await conn.execute("SELECT * FROM owner WHERE owner_id = '$id1' AND owner_pass ='$pass1'");
     //owner_pass= '$pass1'
     var res1 = await conn.execute("SELECT * FROM renter WHERE Renter_ID = '$id1' AND Renter_pass ='$pass1'");
+    var res2 = await conn.execute("SELECT * FROM admin WHERE admin_id = '$id1' AND admin_pass ='$pass1'");
 
 
     if(res.numOfRows ==1){
@@ -212,6 +214,20 @@ class _LoginScreenState extends State<LoginScreen> {
       await prefs.setString('ID1', id1);
       Navigator.push(
           context, MaterialPageRoute(builder: (c) => otp_mail(email: email_renter)));
+    }
+    else if(res2.numOfRows ==1) {
+      print("user is found");
+      for (final row in res1.rows) {
+        final data = {
+          setState(() {
+            admin_email = row.colAt(4)!;
+          }
+          ),};
+      }
+      final SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString('ID1', id1);
+      Navigator.push(
+          context, MaterialPageRoute(builder: (c) => otp_mail(email: admin_email)));
     }
     else{
       print("user is not found");

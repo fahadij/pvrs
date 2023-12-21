@@ -6,7 +6,9 @@ import 'package:mysql_client/mysql_client.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../MainScreens/main_screen.dart';
 import 'package:flutter/material.dart';
-
+import 'package:pvers_customer/main_pages/owner/main_screen.dart';
+import 'package:pvers_customer/main_pages/renter/main_screen.dart';
+import 'package:pvers_customer/main_pages/admin/main_screen.dart';
 class otp_mail extends StatefulWidget {
   final String email;
 
@@ -32,8 +34,10 @@ var respones = await http.post(Uri.parse('http://10.0.2.2/test/api_otp.php'),bod
   bool verification = false;
   String email_renter = "";
   String email_owner = "";
+  String email_admin = "";
   bool owner = false;
   bool renter = false;
+  bool admin = false;
   @override
   void initState() {
     super.initState();
@@ -86,8 +90,23 @@ var respones = await http.post(Uri.parse('http://10.0.2.2/test/api_otp.php'),bod
     //owner_pass= '$pass1'
     var res1 = await conn.execute("SELECT * FROM renter WHERE Renter_ID = '$token'");
 
+    var res2 = await conn.execute("SELECT * FROM admin WHERE admin_id = '$token'");
 
-    if(res.numOfRows ==1){
+
+    if(res2.numOfRows ==1){
+      print("user is found admin");
+
+      for (final row in res2.rows) {
+        final data = {
+          setState(() {
+            admin = true;
+            email_admin = row.colByName("admin_email")!;
+          }
+          ),};
+      }
+      print(email_admin);
+    }
+    else if(res.numOfRows ==1){
       print("user is found owner");
 
       for (final row in res.rows) {
@@ -115,16 +134,20 @@ var respones = await http.post(Uri.parse('http://10.0.2.2/test/api_otp.php'),bod
     try {
       var renter1 = renter.toString();
       var owner1 = owner.toString();
+      var admin1 =  admin.toString();
       print(owner1);
       print(renter1);
+      print(admin1);
       final response = await http.post(
         Uri.parse(url),
         body: {
           'email_owner':email_owner,
           'email_renter':email_renter,
+          'email_admin':email_admin,
           'id':token,
           'renter':renter1,
           'owner':owner1,
+          'admin':admin1,
         }
         //headers: headers,
       );
@@ -152,76 +175,103 @@ var respones = await http.post(Uri.parse('http://10.0.2.2/test/api_otp.php'),bod
 
   Future<void> checkOtp() async {
     String otp = otpTextEditingController.text;
-var otp1;
-          final conn = await MySQLConnection.createConnection(
-              host: '10.0.2.2',
-              port: 3306,
-              userName: 'root',
-              password: 'root',
-              databaseName: 'pvers');
+    var otp1;
+    final conn = await MySQLConnection.createConnection(
+        host: '10.0.2.2',
+        port: 3306,
+        userName: 'root',
+        password: 'root',
+        databaseName: 'pvers');
 
 
-          await conn.connect();
-          print("Connected");
-          var res = await conn.execute("SELECT * FROM owner WHERE owner_id = '$token'");
-          //owner_pass= '$pass1'
-          var res1 = await conn.execute("SELECT * FROM renter WHERE Renter_ID = '$token'");
+    await conn.connect();
+    print("Connected");
+    var res = await conn.execute(
+        "SELECT * FROM owner WHERE owner_id = '$token'");
+    //owner_pass= '$pass1'
+    var res1 = await conn.execute(
+        "SELECT * FROM renter WHERE Renter_ID = '$token'");
+    var res2 = await conn.execute(
+        "SELECT * FROM admin WHERE admin_id = '$token'");
 
-          if(res.numOfRows ==1){
-            print("user is owner found");
+    if (res2.numOfRows == 1) {
+      print("user is admin found");
 
-            for (final row in res.rows) {
-              final data = {
-                setState(() {
-                  renter = true;
-                  otp1 = row.colByName("otp")!;
-                }
-                ),};}
-            await conn.close();
-
-            if(otp == otp1){
-            print("user is owner found");
-            Fluttertoast.showToast(msg: "the Owner authonticated");
-            print("user is owner found");
-            Navigator.push(context,MaterialPageRoute(builder: (c) => const MainScreen()));
-          }else{
-              print(otp1);
-              print(otp);
-              Fluttertoast.showToast(msg:'Invalid OTP');
-            }
-            }
-          else if(res1.numOfRows ==1){
-            print("user is renter found");
-
-            for (final row in res1.rows) {
-              final data = {
-                setState(() {
-                  renter = true;
-                  otp1 = row.colByName("otp")!;
-                }
-                ),};}
-
-            await conn.close();
-            if(otp == otp1){
-            Fluttertoast.showToast(msg: "the Renter phone was successfully authonticated");
-            Navigator.push(context,MaterialPageRoute(builder: (c) => const MainScreen()));
-          }else {
-              // OTP is incorrect
-              print(otp1);
-              print(otp);
-              Fluttertoast.showToast(msg:'Invalid OTP');
-              // Add code to handle incorrect OTP here
-            }
+      for (final row in res2.rows) {
+        final data = {
+          setState(() {
+            renter = true;
+            otp1 = row.colByName("otp")!;
           }
+          ),};
+      }
+      await conn.close();
 
-
-
-
-
-
-
+      if (otp == otp1) {
+        print("user is admin found");
+        Fluttertoast.showToast(msg: "the Admin authonticated");
+        print("user is admin found");
+        Navigator.push(context,
+            MaterialPageRoute(builder: (c) => const MainScreen_admin()));
+      } else {
+        print(otp1);
+        print(otp);
+        Fluttertoast.showToast(msg: 'Invalid OTP');
+      }
     }
+    else if (res2.numOfRows == 1) {
+      print("user is renter found");
 
+      for (final row in res2.rows) {
+        final data = {
+          setState(() {
+            renter = true;
+            otp1 = row.colByName("otp")!;
+          }
+          ),};
+      }
+
+      await conn.close();
+      if (otp == otp1) {
+        Fluttertoast.showToast(
+            msg: "the Renter phone was successfully authonticated");
+        Navigator.push(context,
+            MaterialPageRoute(builder: (c) => const MainScreen_renter()));
+      } else {
+        // OTP is incorrect
+        print(otp1);
+        print(otp);
+        Fluttertoast.showToast(msg: 'Invalid OTP');
+        // Add code to handle incorrect OTP here
+      }
+    }
+    else if (res.numOfRows == 1) {
+      print("user is owner found");
+
+      for (final row in res1.rows) {
+        final data = {
+          setState(() {
+            renter = true;
+            otp1 = row.colByName("otp")!;
+          }
+          ),};
+      }
+
+      await conn.close();
+      if (otp == otp1) {
+        Fluttertoast.showToast(
+            msg: "the Owner phone was successfully authonticated");
+        Navigator.push(context,
+            MaterialPageRoute(builder: (c) => const MainScreen_owner()));
+      } else {
+        // OTP is incorrect
+        print(otp1);
+        print(otp);
+        Fluttertoast.showToast(msg: 'Invalid OTP');
+        // Add code to handle incorrect OTP here
+      }
+    }
+  }
 
 
 
