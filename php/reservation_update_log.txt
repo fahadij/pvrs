@@ -1,0 +1,93 @@
+
+
+Processing reservation: 1
+Current status: canceled
+Start time: 2023-12-12 22:16:22
+End time: 2023-12-14 22:16:00
+
+Processing reservation: 2
+Current status: canceled
+Start time: 2023-12-13 22:17:00
+End time: 2023-12-14 22:17:00
+
+Processing reservation: 3
+Current status: canceled
+Start time: 2023-12-12 23:49:52
+End time: 2023-12-13 23:49:00
+
+Processing reservation: 4
+Current status: active
+Start time: 2023-12-13 02:19:00
+End time: 2023-12-14 02:19:00
+
+Processing reservation: 5
+Current status: active
+Start time: 2023-12-13 07:02:00
+End time: 2023-12-14 07:02:00
+
+Processing reservation: 6
+Current status: expired
+Start time: 2023-12-13 19:42:00
+End time: 2023-12-13 20:00:00
+Skipping reservation - already expired.
+
+Processing reservation: 7
+Current status: pending
+Start time: 2023-12-14 19:43:00
+End time: 2023-12-14 19:43:00
+
+Processing reservation: 8
+Current status: canceled
+Start time: 2023-12-13 22:00:00
+End time: 2023-12-13 22:00:00
+
+Processing reservation: 9
+Current status: active
+Start time: 2023-12-13 23:36:00
+End time: 2023-12-13 23:36:00
+
+Processing reservation: 1
+Current status: canceled
+Start time: 2023-12-12 22:16:22
+End time: 2023-12-14 22:16:00
+
+Processing reservation: 2
+Current status: canceled
+Start time: 2023-12-13 22:17:00
+End time: 2023-12-14 22:17:00
+
+Processing reservation: 3
+Current status: canceled
+Start time: 2023-12-12 23:49:52
+End time: 2023-12-13 23:49:00
+
+Processing reservation: 4
+Current status: active
+Start time: 2023-12-13 02:19:00
+End time: 2023-12-14 02:19:00
+
+Processing reservation: 5
+Current status: active
+Start time: 2023-12-13 07:02:00
+End time: 2023-12-14 07:02:00
+
+Processing reservation: 6
+Current status: expired
+Start time: 2023-12-13 19:42:00
+End time: 2023-12-13 20:00:00
+Skipping reservation - already expired.
+
+Processing reservation: 7
+Current status: pending
+Start time: 2023-12-14 19:43:00
+End time: 2023-12-14 19:43:00
+
+Processing reservation: 8
+Current status: canceled
+Start time: 2023-12-13 22:00:00
+End time: 2023-12-13 22:00:00
+
+Processing reservation: 9
+Current status: active
+Start time: 2023-12-13 23:36:00
+End time: 2023-12-13 23:36:00
