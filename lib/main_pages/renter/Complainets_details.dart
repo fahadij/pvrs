@@ -7,7 +7,7 @@ import 'package:mysql_client/mysql_client.dart'; // Updated import statement
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
-import 'package:pvers_customer/tab_pages/Complaine_page.dart';
+import 'Complaine_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 class ComplainetsDetailsPage extends StatefulWidget {
   final int? complaintId;

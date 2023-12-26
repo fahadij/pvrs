@@ -219,10 +219,10 @@ var respones = await http.post(Uri.parse('http://10.0.2.2/test/api_otp.php'),bod
         Fluttertoast.showToast(msg: 'Invalid OTP');
       }
     }
-    else if (res2.numOfRows == 1) {
+    else if (res1.numOfRows == 1) {
       print("user is renter found");
 
-      for (final row in res2.rows) {
+      for (final row in res1.rows) {
         final data = {
           setState(() {
             renter = true;

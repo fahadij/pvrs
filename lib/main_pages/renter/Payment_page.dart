@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:mysql1/mysql1.dart';
 import 'package:mysql_client/mysql_client.dart';
-import 'package:pvers_customer/tab_pages/home_tab.dart';
+import 'home_tab.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:pvers_customer/MainScreens/main_screen.dart';
+import 'main_screen.dart';
 
 
 
@@ -29,7 +29,8 @@ class _PaymentPageState extends State<PaymentPage> {
   String? reservationDateStringend;
   String active = "active";
   String pending = "pending";
-
+  var contract_id1;
+var lastInsertId;
 
  void  initState(){
    getCred();
@@ -51,7 +52,7 @@ class _PaymentPageState extends State<PaymentPage> {
   getCred() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-         
+         contract_id1 = pref.getString("Contract_id");
       userId = pref.getString("ID1");
       amountController.text = pref.getString("TotalPrice")!;
         token21 = pref.getString("selectedVIDreft")!;
@@ -109,7 +110,7 @@ DateTime now2 = DateTime.now();
 
     Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => MainScreen()));
+        MaterialPageRoute(builder: (context) => MainScreen_renter()));
   }
   Future<void> _createReservation() async {
     print("Connecting to mysql server... _createReservation");
@@ -138,7 +139,14 @@ DateTime now2 = DateTime.now();
             "ev": reservationDateStringend,
             "et": pending,
           });
+      //contract_id1
+      var lastInsertId = res.lastInsertID;
+      String lastInsertId1 = lastInsertId.toString();
+      var res3 = await connection.execute(
+            "UPDATE contract SET Res_num = '$lastInsertId1' WHERE Con_No = '$contract_id1'");
       print(res.affectedRows);
+      var affeted = res3.affectedRows;
+      print("this is for the update for the contract:$affeted");
 
     } else if (now.isAfter(reservationDateTime!)) {
       var res = await connection.execute(
@@ -150,6 +158,15 @@ DateTime now2 = DateTime.now();
             "ev": reservationDateStringend,
             "et": active,
           });
+      lastInsertId = res.lastInsertID;
+      String lastInsertId1 = lastInsertId.toString();
+
+
+      var res3 = await connection.execute(
+          "UPDATE contract SET Res_num = '$lastInsertId1' WHERE Con_No = '$contract_id1'");
+      print(res.affectedRows);
+      var affeted = res3.affectedRows;
+      print("this is for the update for the contract:$affeted");
       print(res.affectedRows);
     }
     connection.close();

@@ -6,9 +6,9 @@ import 'package:get/get_utils/src/get_utils/get_utils.dart';
 import 'package:mysql_client/mysql_client.dart';
 import '../admin/My_reservations_wip.dart';
 import '../admin/invoic.dart';
+import '../admin/Contract_wip.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:pvers_customer/authentication/Contract_wip.dart';
 import 'package:pvers_customer/authentication/image_show_user.dart';
 import 'package:pvers_customer/authentication/login_screen.dart';
 import 'FAQ.dart';
@@ -389,6 +389,27 @@ class _profilepageState extends State<profilepage> {
                   Navigator.push(
                       context,
                       MaterialPageRoute(builder: (c) => ReservationpageAdmin()));
+                },
+                style:
+                ElevatedButton.styleFrom(
+                  backgroundColor: Colors.lightGreenAccent,
+                ),
+
+                child: Text
+                  (
+                  "go to Reservations page",
+                  style: TextStyle(
+                    color: Colors.black54,
+                    fontSize: 18,
+                  ),
+
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (c) => VehicleRentalContractPage()));
                 },
                 style:
                 ElevatedButton.styleFrom(

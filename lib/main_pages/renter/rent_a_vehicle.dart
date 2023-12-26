@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mysql_client/mysql_client.dart';
-import 'package:printing/printing.dart';
-import 'package:pvers_customer/authentication/vehicle_page_rent.dart';
-import 'package:pvers_customer/tab_pages/home_tab.dart';
+import 'vehicle_page_rent.dart';
+import 'home_tab.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 

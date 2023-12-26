@@ -4,8 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get_utils/src/get_utils/get_utils.dart';
 import 'package:mysql_client/mysql_client.dart';
-import 'package:pvers_customer/authentication/My_reservations_wip.dart';
-import 'package:pvers_customer/invoic.dart';
+import 'My_reservations_wip.dart';
+import 'invoic.dart';
+import 'package:pvers_customer/main_pages/renter/Contract_list.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:pvers_customer/authentication/Contract_wip.dart';
@@ -419,6 +420,27 @@ class _profilepageState extends State<profilepage> {
                 child: Text
                   (
                   "go to invoice page",
+                  style: TextStyle(
+                    color: Colors.black54,
+                    fontSize: 18,
+                  ),
+
+                ),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (c) => Contract_list()));
+                },
+                style:
+                ElevatedButton.styleFrom(
+                  backgroundColor: Colors.lightGreenAccent,
+                ),
+
+                child: Text
+                  (
+                  "go to Contract page",
                   style: TextStyle(
                     color: Colors.black54,
                     fontSize: 18,

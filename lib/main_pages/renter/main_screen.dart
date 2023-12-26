@@ -1,17 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:pvers_customer/authentication/login_screen.dart';
-import 'package:pvers_customer/tab_pages/home_tab.dart';
-import 'package:pvers_customer/authentication/host_a_vehicle.dart';
-import 'package:pvers_customer/tab_pages/profile.dart';
-import 'package:pvers_customer/authentication/rent_a_vehicle.dart';
+import 'home_tab.dart';
+import 'profile.dart';
+import 'rent_a_vehicle.dart';
+import 'Complaine_page.dart';
+import 'FAQ.dart';
 
-
-
-import 'package:pvers_customer/main_pages/renter/Complaine_page.dart';
-import 'package:pvers_customer/main_pages/renter/FAQ.dart';
-import 'package:pvers_customer/authentication/Payment_page.dart';
-import 'package:pvers_customer/authentication/signup_page.dart';
-import 'package:pvers_customer/authentication/My_vehicle_page.dart';
 
 class MainScreen_renter extends StatefulWidget
 {
@@ -79,7 +72,7 @@ class _MainScreen_renterState extends State<MainScreen_renter> with SingleTicker
   void initState(){
     super.initState();
 
-    tabController = TabController(length: 7, vsync: this);
+    tabController = TabController(length: 5, vsync: this);
   }
   @override
   Widget build(BuildContext context) {

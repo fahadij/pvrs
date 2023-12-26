@@ -5,6 +5,7 @@ import 'package:printing/printing.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'Contract_wip.dart';
 import 'Payment_page.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -427,7 +428,7 @@ class _VehicleDetailsPageState extends State<VehicleDetailsPage> {
 
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => PaymentPage()),
+                            MaterialPageRoute(builder: (context) => VehicleRentalContractPage()),
                           );
                         },
                         child: Text('Rent it Now'),

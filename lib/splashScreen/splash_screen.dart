@@ -94,7 +94,7 @@ print("renter checked is $R");
         var res4 = await conn.execute("SELECT * FROM renter WHERE Renter_ID = '$ID' AND otp IS NOT NULL");
         if(res4.numOfRows == 1){
           print("user is renter found and the phone is authonticated");
-          Navigator.push(context,MaterialPageRoute(builder: (c) => const MainScreen()));
+          Navigator.push(context,MaterialPageRoute(builder: (c) => otp_mail(email: emailrenter)));
         } else{
           print("user is renter found and the phone is not authonticated");
           for (final row in res4.rows) {
@@ -116,7 +116,7 @@ print("renter checked is $R");
           print("user is owner found and the mail is authonticated");
 
           Navigator.push(
-              context, MaterialPageRoute(builder: (c) => const MainScreen()));
+              context, MaterialPageRoute(builder: (c) => otp_mail(email: adminemail)));
         } else {
           print("user is admin found and the mail is not authonticated");
           for (final row in res5.rows) {
