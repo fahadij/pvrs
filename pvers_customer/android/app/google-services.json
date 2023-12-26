@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "826405813464",
+    "firebase_url": "https://pvre-1425a-default-rtdb.firebaseio.com",
+    "project_id": "pvre-1425a",
+    "storage_bucket": "pvre-1425a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:826405813464:android:f55d02f55def5ab993ebad",
+        "android_client_info": {
+          "package_name": "com.example.pvers_customer"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAvHWoEVUj-dkMxtbvZ6Cn_ok38dxXliwY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

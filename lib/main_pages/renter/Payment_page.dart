@@ -37,10 +37,10 @@ class _PaymentPageState extends State<PaymentPage> {
 
   validateForm() async {
 
-    /*if (cardNumberController.text.length < 16) {
+    if (cardNumberController.text.length < 16) {
       Fluttertoast.showToast(msg: "card number must be 16 digit.");
     }
-    else */ if (CCVController.text.length < 3) {
+    else  if (CCVController.text.length < 3) {
       Fluttertoast.showToast(msg: "CCV must be 3 numbers.");
     }
     else {

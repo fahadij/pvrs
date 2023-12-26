@@ -7,11 +7,10 @@ import 'package:pvers_customer/authentication/rent_a_vehicle.dart';
 
 
 
-import 'package:pvers_customer/tab_pages/Complaine_page.dart';
-import 'package:pvers_customer/tab_pages/FAQ.dart';
+import 'package:pvers_customer/main_pages/renter/Complaine_page.dart';
+import 'package:pvers_customer/main_pages/renter/FAQ.dart';
 import 'package:pvers_customer/authentication/Payment_page.dart';
 import 'package:pvers_customer/authentication/signup_page.dart';
-import 'package:pvers_customer/authentication/Select_page.dart';
 import 'package:pvers_customer/authentication/My_vehicle_page.dart';
 
 class MainScreen_renter extends StatefulWidget
@@ -92,11 +91,9 @@ class _MainScreen_renterState extends State<MainScreen_renter> with SingleTicker
        controller: tabController,
        children:  [
          hometabpage(),
-         hostacarpage(),
          VehicleRenterPage(),
          FAQScreen(),
          Complaints_page(),
-         SelectPage(),
          profilepage(),
 
        ],
@@ -109,10 +106,6 @@ class _MainScreen_renterState extends State<MainScreen_renter> with SingleTicker
             label: "Home",
           ),
 
-          BottomNavigationBarItem(
-            icon: Icon(Icons.pedal_bike),
-            label: "host a car",
-          ),
 
           BottomNavigationBarItem(
             icon: Icon(Icons.directions_bike),
@@ -128,10 +121,6 @@ class _MainScreen_renterState extends State<MainScreen_renter> with SingleTicker
           BottomNavigationBarItem(
             icon: Icon(Icons.speaker),
             label: "Complaints page",
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.card_travel),
-            label: "My Vehicles",
           ),
 
           BottomNavigationBarItem(

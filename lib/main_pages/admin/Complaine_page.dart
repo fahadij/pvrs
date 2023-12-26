@@ -151,13 +151,8 @@ class _Complaints_page extends State<Complaints_page> {
     await conn.connect();
     print("Connected");
 
-    var check_user_is_owner = await conn.execute("SELECT * FROM owner WHERE owner_id = '$token'");
-    var check_user_is_renter = await conn.execute("SELECT * FROM renter WHERE Renter_ID = '$token'");
-    print(check_user_is_owner.numOfRows);
-    if (check_user_is_owner.numOfRows == 1) {
-      print("user is owner");
 
-      var res = await conn.execute("SELECT * FROM complaints WHERE owner_id = $token");
+      var res = await conn.execute("SELECT * FROM complaints");
 
       List<Map<String, String>> list = [];
       for (final row in res.rows) {
@@ -174,28 +169,9 @@ class _Complaints_page extends State<Complaints_page> {
           print(tempList1);
         });
       }
-      await conn.close();
-    } else if (check_user_is_renter.numOfRows == 1) {
-      print("user is renter");
-      var results = await conn.execute("SELECT * FROM complaints WHERE Renter_ID = $token");
-      List<Map<String, String>> list = [];
-      for (final row in results.rows) {
-        final data = {
-          'id': row.colByName("complaint_no")!,
-          'question': row.colByName("complaint_sub")!,
-          'answer': row.colByName("complaint_description")!,
-        };
-        list.add(data);
 
-        setState(() {
-          displayList = list;
-          tempList1 = list;
-          print(displayList);
-          print(tempList1);
-        });
-      }
       await conn.close();
-    }
+
   }
 
   Future<void> insert() async {
@@ -284,59 +260,6 @@ class _Complaints_page extends State<Complaints_page> {
       appBar: AppBar(
         title: Text('Complaint Page'),
         automaticallyImplyLeading: false,
-        actions: [
-          IconButton(
-            icon: Icon(Icons.add),
-            onPressed: () {
-              questionController.text = '';
-              answerController.text = '';
-              idController.text = '';
-
-              showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    title: Text('Add Complaint'),
-                    content: SingleChildScrollView(
-                      child: Column(
-                        children: [
-                          TextField(
-                            controller: idController,
-                            decoration: InputDecoration(labelText: 'ID'),
-                            readOnly: true,
-                          ),
-                          TextField(
-                            controller: questionController,
-                            decoration: InputDecoration(labelText: 'subject'),
-                          ),
-                          TextField(
-                            controller: answerController,
-                            decoration: InputDecoration(labelText: 'Text'),
-                          ),
-                        ],
-                      ),
-                    ),
-                    actions: [
-                      TextButton(
-                        child: Text('Cancel'),
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                      ),
-                      TextButton(
-                        child: Text('Save'),
-                        onPressed: () {
-                          _addComplaints(questionController.text, answerController.text, idController.text);
-                          Navigator.of(context).pop();
-                        },
-                      ),
-                    ],
-                  );
-                },
-              );
-            },
-          ),
-        ],
       ),
       body: Column(
         children: [

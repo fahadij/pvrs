@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pvers_customer/authentication/login_screen.dart';
 import 'package:pvers_customer/tab_pages/home_tab.dart';
-import 'package:pvers_customer/authentication/host_a_vehicle.dart';
 import '../admin/profile.dart';
-import 'package:pvers_customer/authentication/rent_a_vehicle.dart';
 
 
 
@@ -78,7 +76,7 @@ class _MainScreen_adminState extends State<MainScreen_admin> with SingleTickerPr
   void initState(){
     super.initState();
 
-    tabController = TabController(length: 7, vsync: this);
+    tabController = TabController(length: 5, vsync: this);
   }
   @override
   Widget build(BuildContext context) {
@@ -90,8 +88,6 @@ class _MainScreen_adminState extends State<MainScreen_admin> with SingleTickerPr
        controller: tabController,
        children:  [
          hometabpage(),
-         hostacarpage(),
-         VehicleRenterPage(),
          FAQScreen(),
          Complaints_page(),
          SelectPage(),
@@ -106,18 +102,6 @@ class _MainScreen_adminState extends State<MainScreen_admin> with SingleTickerPr
             icon: Icon(Icons.home),
             label: "Home",
           ),
-
-          BottomNavigationBarItem(
-            icon: Icon(Icons.pedal_bike),
-            label: "host a car",
-          ),
-
-          BottomNavigationBarItem(
-            icon: Icon(Icons.directions_bike),
-            label: "Rent a car",
-          ),
-
-
 
           BottomNavigationBarItem(
             icon: Icon(Icons.question_answer),

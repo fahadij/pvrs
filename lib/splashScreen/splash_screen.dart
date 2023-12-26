@@ -105,14 +105,14 @@ print("renter checked is $R");
             };};
           print("this is the value of email$emailrenter");
           await conn.close();
-          Navigator.push(context,MaterialPageRoute(builder: (c) =>  otp_mail(email: emailowner)));
+          Navigator.push(context,MaterialPageRoute(builder: (c) =>  otp_mail(email: emailrenter)));
         }
     }
       if(res2.numOfRows == 1) {
         print("user is admin found");
         var res5 = await conn.execute(
             "SELECT * FROM admin WHERE admin_id = '$ID'");
-        if (res5.numOfRows == 1) {
+        if (res5.numOfRows == 2) {
           print("user is owner found and the mail is authonticated");
 
           Navigator.push(
@@ -122,13 +122,11 @@ print("renter checked is $R");
           for (final row in res5.rows) {
             final data = {
               setState(() {
-                phonenumber = row.colByName("owner_phonenum")!;
                 adminemail = row.colByName("admin_email")!;
               },)
             };
           };
           await conn.close();
-          print("this is the value of phone for admin$phonenumber");
           print("this is the value of email for admin$adminemail");
           Navigator.push(context,
               MaterialPageRoute(builder: (c) => otp_mail(email: adminemail)));

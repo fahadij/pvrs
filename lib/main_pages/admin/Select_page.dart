@@ -63,8 +63,8 @@ class _SelectPageState extends State<SelectPage> {
     print(token2);
     // make query
     var result = await conn.execute(
-        "SELECT V_num,V_Name,V_Model FROM vehicle WHERE owner_id_V = $token2  ORDER BY V_num ASC");
-
+        "SELECT * FROM vehicle");
+     //SELECT V_num,V_Name,V_Model FROM vehicle WHERE owner_id_V = $token2  ORDER BY V_num ASC
     // print some result data
     //print(result.numOfColumns);
     //print(result.numOfRows);

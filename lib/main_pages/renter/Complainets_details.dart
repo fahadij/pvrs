@@ -61,6 +61,7 @@ class _ComplainetsDetailsPageState extends State<ComplainetsDetailsPage> {
     try {
       var subject;
       var text;
+      var answer;
       final conn = await MySQLConnection.createConnection(
           host: '10.0.2.2',
           port: 3306,
@@ -68,19 +69,21 @@ class _ComplainetsDetailsPageState extends State<ComplainetsDetailsPage> {
           password: 'root',
           databaseName: 'pvers');
       await conn.connect();
-     print(complaintId);
+      print(complaintId);
       var results = await conn.execute(
-        "SELECT complaint_sub, complaint_description FROM complaints WHERE complaint_no = $complaintId");
+          "SELECT complaint_sub, complaint_description, complaint_answer FROM complaints WHERE complaint_no = $complaintId");
 
       if (results.isNotEmpty) {
         for (final row in results.rows) {
           subject = row.colByName("complaint_sub");
           text = row.colByName("complaint_description");
+          answer = row.colByName("complaint_answer");
         }
 
         setState(() {
           subjectController.text = subject;
           textController.text = text;
+          answerController.text = answer;
         });
       } else {
         print('No complaint found with ID $complaintId');

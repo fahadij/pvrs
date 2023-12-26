@@ -36,7 +36,7 @@ class _ComplainetsDetailsPageState extends State<ComplainetsDetailsPage> {
       print(token);
     });
   }
-  Future<void> updateComplaint(String subject, String text, int complaintId) async {
+  Future<void> updateComplaint(String subject, String text, int complaintId, String answer) async {
     try {
       final conn = await MySQLConnection.createConnection(
           host: '10.0.2.2',
@@ -48,7 +48,7 @@ class _ComplainetsDetailsPageState extends State<ComplainetsDetailsPage> {
 
       // Use prepared statements with named parameters
       var results = await conn.execute(
-        "UPDATE complaints SET complaint_sub = '$subject', complaint_description = '$text' WHERE complaint_no = '$complaintId'",
+        "UPDATE complaints SET complaint_answer = '$answer'  WHERE complaint_no = '$complaintId'",
       );
       print(results.numOfRows);
       print('Complaint submitted successfully!');
@@ -61,6 +61,7 @@ class _ComplainetsDetailsPageState extends State<ComplainetsDetailsPage> {
     try {
       var subject;
       var text;
+      var answer;
       final conn = await MySQLConnection.createConnection(
           host: '10.0.2.2',
           port: 3306,
@@ -70,17 +71,19 @@ class _ComplainetsDetailsPageState extends State<ComplainetsDetailsPage> {
       await conn.connect();
      print(complaintId);
       var results = await conn.execute(
-        "SELECT complaint_sub, complaint_description FROM complaints WHERE complaint_no = $complaintId");
+        "SELECT complaint_sub, complaint_description, complaint_answer FROM complaints WHERE complaint_no = $complaintId");
 
       if (results.isNotEmpty) {
         for (final row in results.rows) {
           subject = row.colByName("complaint_sub");
           text = row.colByName("complaint_description");
+          answer = row.colByName("complaint_answer");
         }
 
         setState(() {
           subjectController.text = subject;
           textController.text = text;
+          answerController.text = answer;
         });
       } else {
         print('No complaint found with ID $complaintId');
@@ -312,11 +315,13 @@ print(check_user_is_owner.numOfRows);
             TextField(
               controller: subjectController,
               decoration: InputDecoration(labelText: 'Subject'),
+              readOnly: true,
             ),
             SizedBox(height: 10),
             TextField(
               controller: textController,
               decoration: InputDecoration(labelText: 'Text'),
+              readOnly: true,
             ),
             SizedBox(height: 20),
             ElevatedButton(
@@ -325,6 +330,7 @@ print(check_user_is_owner.numOfRows);
                   subjectController.text,
                   textController.text,
                     widget.complaintId!,
+                  answerController.text,
                 );
               },
               child: Text('update Complaint'),
@@ -333,7 +339,6 @@ print(check_user_is_owner.numOfRows);
             TextField(
               controller: answerController,
               decoration: InputDecoration(labelText: 'Answer'),
-              readOnly: true,
             ),
             SizedBox(height: 20),
             ElevatedButton(

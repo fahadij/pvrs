@@ -29,7 +29,7 @@ class _profilepageState extends State<profilepage> {
   TextEditingController emailTextEditingController = TextEditingController();
   String? token;
   String? token2;
-  String? _imageLink = "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Square_-_black_simple.svg/2048px-Square_-_black_simple.svg.png";
+  String? _imageLink = "https://ssl.gstatic.com/ui/v1/icons/mail/rfr/logo_gmail_lockup_default_2x_r5.png";
 
 
   @override
