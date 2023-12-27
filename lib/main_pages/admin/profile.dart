@@ -409,7 +409,7 @@ class _profilepageState extends State<profilepage> {
                 onPressed: () {
                   Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (c) => VehicleRentalContractPage()));
+                      MaterialPageRoute(builder: (c) => Contract_list()));
                 },
                 style:
                 ElevatedButton.styleFrom(
@@ -448,7 +448,44 @@ class _profilepageState extends State<profilepage> {
                 ),
               ),
 
-            ],
+            ],/*  Future<void> archive() async {
+    print("Connecting to MySQL server...");
+    var num1 = "${invoice['reservation_num']}";
+    final conn = await MySQLConnection.createConnection(
+      host: '10.0.2.2',
+      port: 3306,
+      userName: 'root',
+      password: 'root',
+      databaseName: 'pvers',
+    );
+
+    await conn.connect();
+    print("Connected");
+
+    var res = await conn.execute(
+      "SELECT * FROM reservation WHERE RESno = '$num1'",
+    );
+
+    for (final row in res.rows) {
+      final reservationId = row.colByName("RESno");
+      final currentStatus = row.colByName("RES_Status");
+      final startTime = DateTime.parse(row.colByName("RES_DateTime_start")!);
+      final endTime = DateTime.parse(row.colByName("RES_DateTime_end")!);
+      final RVID2 = row.colByName("V_num_RES");
+      final user_id = row.colByName("V_Renter_Id");
+      var res = await conn.execute(
+          "INSERT TO reservations_archive (RESno_old,V_num_RES_, V_Renter_Id, RES_DateTime_start, RES_DateTime_end,RES_Status) VALUES (:test1,:vid1, :vn, :vm, :ev, :et)",
+
+          {
+            "test1": reservationId,
+            "vid1": RVID2,
+            "vn": user_id,
+            "vm": startTime,
+            "ev": endTime,
+            "et": currentStatus,
+          });
+    }
+  }*/
           ),
 
         ),

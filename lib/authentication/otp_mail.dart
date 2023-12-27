@@ -248,7 +248,7 @@ var respones = await http.post(Uri.parse('http://10.0.2.2/test/api_otp.php'),bod
     else if (res.numOfRows == 1) {
       print("user is owner found");
 
-      for (final row in res1.rows) {
+      for (final row in res.rows) {
         final data = {
           setState(() {
             renter = true;

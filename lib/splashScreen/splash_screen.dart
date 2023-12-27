@@ -66,13 +66,13 @@ print("owner checked is $o");
 print("renter checked is $R");
       if(res.numOfRows == 1) {
         print("user is owner found");
-        var res2 = await conn.execute(
+        var res10 = await conn.execute(
             "SELECT * FROM owner WHERE owner_id = '$ID'");
-        if (res2.numOfRows == 1) {
+        if (res10.numOfRows == 1) {
           print("user is owner found and the mail is authonticated");
 
           Navigator.push(
-              context, MaterialPageRoute(builder: (c) => const MainScreen_admin()));
+              context, MaterialPageRoute(builder: (c) => otp_mail(email: emailowner)));
         } else {
           print("user is owner found and the mail is not authonticated");
           for (final row in res.rows) {
@@ -113,7 +113,7 @@ print("renter checked is $R");
         var res5 = await conn.execute(
             "SELECT * FROM admin WHERE admin_id = '$ID'");
         if (res5.numOfRows == 2) {
-          print("user is owner found and the mail is authonticated");
+          print("user is admin found and the mail is authonticated");
 
           Navigator.push(
               context, MaterialPageRoute(builder: (c) => otp_mail(email: adminemail)));

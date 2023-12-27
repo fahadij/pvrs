@@ -234,7 +234,7 @@ class InvoiceDetailPage extends StatelessWidget {
             ),
             child: const Text
               (
-              "print invoice",
+              "print contract",
               style: TextStyle(
                 color: Colors.black54,
                 fontSize: 18,

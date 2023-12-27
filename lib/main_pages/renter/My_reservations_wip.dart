@@ -15,6 +15,8 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/data/latest.dart';
 
+import 'Reservation_update.dart';
+
 
 const int reminderNotificationTime = 3 * 60 * 60; // 3 hours before reservation
 
@@ -27,6 +29,15 @@ class Reservationpage extends StatefulWidget {
 
 class _ReservationpageState extends State<Reservationpage> {
   List<Map<String, dynamic>> invoices = [];
+   var token2;
+
+  void getCred() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    setState(() {
+      token2 = pref.getString("ID1")!;
+      print(token2);
+    });
+  }
 
 
   Future<void> fetchReservations() async {
@@ -44,7 +55,7 @@ class _ReservationpageState extends State<Reservationpage> {
 
     await conn.connect();
     var results = await conn.execute(
-      "SELECT * FROM reservation ORDER BY RESno ASC",
+      "SELECT * FROM reservation WHERE V_Renter_Id = $token2 ORDER BY RESno ASC",
 
     );
 
@@ -169,12 +180,13 @@ class _ReservationpageState extends State<Reservationpage> {
 
 
 
+
   @override
   void initState() {
     super.initState();
     updateReservationStatuses();
     fetchReservations();
-
+    getCred();
   }
 
 
@@ -221,6 +233,7 @@ class _ReservationpageState extends State<Reservationpage> {
   }
 
 }
+
 class InvoiceDetailPage extends StatelessWidget {
   final Map<String, dynamic> invoice;
 
@@ -310,6 +323,7 @@ class InvoiceDetailPage extends StatelessWidget {
 
 
   @override
+
   Widget build(BuildContext context) {
     var start_date = "${invoice['RES_DateTime_start1']}";
     var num = "${invoice['reservation_num']}";
@@ -361,6 +375,32 @@ class InvoiceDetailPage extends StatelessWidget {
             child: const Text
               (
               "Print Reservation",
+              style: TextStyle(
+                color: Colors.black54,
+                fontSize: 18,
+              ),
+
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              update();
+              Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => UpdateReservationPage()),
+              );
+
+            },
+
+            //Navigator.push(context,MaterialPageRoute(builder: (c) => const MainScreen()));
+
+
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.lightGreenAccent,
+            ),
+            child: const Text
+              (
+              "Update Reservation",
               style: TextStyle(
                 color: Colors.black54,
                 fontSize: 18,
@@ -436,14 +476,62 @@ class InvoiceDetailPage extends StatelessWidget {
     await conn.connect();
     print("Connected");
     var res = await conn.execute("UPDATE reservation SET RES_Status='canceled' WHERE RESno = '$num1'");
-
+    var res2 = await conn.execute("UPDATE contract SET Con_status='canceled' WHERE RESno = '$num1'");
     print(res.affectedRows);
+    print(res2.affectedRows);
 
     await conn.close();
 
 
     Fluttertoast.showToast(msg: "the Vehicle removed successfully");
 
+  }
+  Future<void> update() async {
+    print("Connecting to MySQL server...");
+    var num1 = "${invoice['reservation_num']}";
+    try {
+      final conn = await MySQLConnection.createConnection(
+        host: '10.0.2.2',
+        port: 3306,
+        userName: 'root',
+        password: 'root',
+        databaseName: 'pvers',
+      );
+
+      await conn.connect();
+      print("Connected");
+
+      var res = await conn.execute(
+        "SELECT * FROM reservation WHERE RESno = '$num1'",
+      );
+
+      for (final row in res.rows) {
+        final reservationId = row.colByName("RESno");
+        final currentStatus = row.colByName("RES_Status");
+        final startTime = DateTime.parse(row.colByName("RES_DateTime_start")!);
+        final endTime = DateTime.parse(row.colByName("RES_DateTime_end")!);
+        final RVID2 = row.colByName("V_num_RES");
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString('start_date', startTime.toIso8601String());
+        await prefs.setString('end_date', endTime.toIso8601String());
+        await prefs.setString('RVID', RVID2!);
+        await prefs.setString('RID1', reservationId!);
+        print(startTime.toIso8601String());
+        print(endTime.toIso8601String());
+        if (currentStatus == "pending" && DateTime.now().isAfter(startTime)) {
+          // Navigate to update page for pending reservations
+
+
+
+        }
+      }
+
+      print(res.affectedRows);
+      await conn.close();
+    } catch (e) {
+      print("Error: $e");
+      // Handle connection errors appropriately
+    }
   }
 }
 
